@@ -70,7 +70,7 @@ export function getSimulatedCsvContent(): string {
       
       const cleanId = `${catObj.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-imported-${i + 1}`;
       const name = `${profile.name} (v.${modelNum})`;
-      const desc = `Premium showroom approved device under the ${catObj.name} category. Specifically configured for Lira electronics distributions with original factory seals, physical invoice support, and robust local store warranties. Certified genuine.`;
+      const desc = `Premium store approved device under the ${catObj.name} category. Specifically configured for Lira electronics distributions with original factory seals, physical invoice support, and robust local store warranties. Certified genuine.`;
       
       // Stagger price to look highly realistic
       const priceModifier = 1 + ((i % 10) - 5) * 0.02; // +/- 10%

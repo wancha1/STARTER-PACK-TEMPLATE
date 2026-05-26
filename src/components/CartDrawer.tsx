@@ -4,6 +4,45 @@ import { X, ShoppingBag, Plus, Minus, Trash2, Smartphone, ShieldCheck, HelpCircl
 import { BUSINESS_INFO } from "../data";
 import { motion, AnimatePresence } from "motion/react";
 
+// High-quality Unsplash image mapping for individual items
+const getProductImageUrl = (product: any) => {
+  if (product.images && product.images[0]) {
+    return product.images[0];
+  }
+  if (product.image) {
+    return product.image;
+  }
+  const images: Record<string, string> = {
+    "iphone-15-pro-max": "https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=1200&q=80",
+    "galaxy-s24-ultra": "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=1200&q=80",
+    "macbook-pro-m3": "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1200&q=80",
+    "hp-elitebook-840": "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=1200&q=80",
+    "sony-ps5-slim": "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&w=1200&q=80",
+    "samsung-55-4k": "https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=1200&q=80",
+    "airpods-pro-2": "https://images.unsplash.com/photo-1588449668338-d13417f16cd9?auto=format&fit=crop&w=1200&q=80",
+    "anker-prime-100w": "https://images.unsplash.com/photo-1622445262465-2481c4574875?auto=format&fit=crop&w=1200&q=80"
+  };
+
+  if (images[product.id]) {
+    return images[product.id];
+  }
+
+  const category = String(product.category || "").toLowerCase();
+  if (category.includes("phone")) {
+    return "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=80";
+  }
+  if (category.includes("laptop") || category.includes("computer")) {
+    return "https://images.unsplash.com/photo-1496181130204-755241524eab?auto=format&fit=crop&w=1200&q=80";
+  }
+  if (category.includes("tv") || category.includes("audio")) {
+    return "https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=1200&q=80";
+  }
+  if (category.includes("gaming") || category.includes("console")) {
+    return "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&w=1200&q=80";
+  }
+  return "https://images.unsplash.com/photo-1468495244123-6c6c332eeece?auto=format&fit=crop&w=1200&q=80";
+};
+
 export default function CartDrawer() {
   const {
     cart,
@@ -64,7 +103,7 @@ export default function CartDrawer() {
           <div className="flex flex-col text-left">
             <span className="text-[9px] font-mono uppercase text-sky-400 tracking-wider font-extrabold flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 bg-sky-400 rounded-full animate-pulse" />
-              Live Showroom Valuation
+              Live Store Valuation
             </span>
             <span className="text-xs font-semibold text-white">Cart Index Dynamics</span>
           </div>
@@ -205,7 +244,7 @@ export default function CartDrawer() {
       itemsText += `   Qty: ${item.quantity} × ${priceStr} = ${totalItemPriceStr}\n\n`;
     });
 
-    const deliveryFee = paymentMethod === "Showroom Pick-up" ? 0 : 35000;
+    const deliveryFee = paymentMethod === "Store Pick-up" ? 0 : 35000;
     const finalTotal = Math.max(0, cartSubtotal + deliveryFee - discountAmount);
 
     const invoiceMessage = `*APEX DEVICES ELECTRONICS - ORDER INVOICE * 📦
@@ -218,7 +257,7 @@ export default function CartDrawer() {
 -------------------------------------------
 • *Name:* ${customerName}
 • *Phone Call line:* ${customerPhone}
-• *Delivery Zone:* ${deliveryArea || "Showroom pick-up requested"}
+• *Delivery Zone:* ${deliveryArea || "Store pick-up requested"}
 • *Payment Mode:* ${paymentMethod}
 ${specialInstructions ? `• *Special Notes:* "${specialInstructions}"\n` : ""}
 
@@ -234,7 +273,7 @@ ${activeCode ? `• *Discount Applied:* -${formatCurrency(discountAmount)} (${ac
 🔥 *ESTIMATED TOTAL:* ${formatCurrency(finalTotal)}
 -------------------------------------------
 
-Hello ${BUSINESS_INFO.name}! 👋 I placed an order via your online store. Please verify stock availability at your showroom so I can proceed with immediate payment!`;
+Hello ${BUSINESS_INFO.name}! 👋 I placed an order via your online store. Please verify stock availability at your store so I can proceed with immediate payment!`;
 
     window.open(`https://wa.me/${BUSINESS_INFO.whatsappNumber}?text=${encodeURIComponent(invoiceMessage)}`, "_blank");
     clearCart();
@@ -304,7 +343,6 @@ Hello ${BUSINESS_INFO.name}! 👋 I placed an order via your online store. Pleas
               ) : !isCheckingOut ? (
                 /* Item list mode */
                 <div className="space-y-4">
-                  {renderCartChart()}
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-[10px] font-mono uppercase text-slate-500 tracking-wider">Shopping Invoice Details</span>
                     <button
@@ -323,8 +361,13 @@ Hello ${BUSINESS_INFO.name}! 👋 I placed an order via your online store. Pleas
                         className="bg-white/3 border border-white/5 hover:border-white/10 p-3.5 rounded-2xl flex items-start gap-3 transition-all"
                       >
                         {/* Interactive Mini-image representation */}
-                        <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-blue-500/10 to-purple-600/10 border border-white/5 shrink-0 flex items-center justify-center text-blue-400">
-                          📦
+                        <div className="w-11 h-11 rounded-xl border border-white/10 shrink-0 overflow-hidden bg-neutral-900 flex items-center justify-center">
+                          <img
+                            src={getProductImageUrl(item.product)}
+                            alt={item.product.name}
+                            className="w-full h-full object-cover"
+                            referrerPolicy="no-referrer"
+                          />
                         </div>
 
                         {/* Detail text */}
@@ -443,7 +486,7 @@ Hello ${BUSINESS_INFO.name}! 👋 I placed an order via your online store. Pleas
                     >
                       <option value="Cash on Delivery">Cash on Delivery (MTN Mobile Money/Cash)</option>
                       <option value="Airtel Money Instant Transfer">Airtel Money Instant</option>
-                      <option value="Showroom Pick-up">Showroom Pick-up & Cash Desk</option>
+                      <option value="Store Pick-up">Store Pick-up & Cash Desk</option>
                     </select>
                   </div>
 
@@ -534,13 +577,13 @@ Hello ${BUSINESS_INFO.name}! 👋 I placed an order via your online store. Pleas
                   <div className="flex justify-between">
                     <span className="text-slate-400">Delivery & Setup (Lira Area):</span>
                     <span className="text-white text-right">
-                      {paymentMethod === "Showroom Pick-up" ? "UGX 0" : "UGX 35,000"}
+                      {paymentMethod === "Store Pick-up" ? "UGX 0" : "UGX 35,000"}
                     </span>
                   </div>
                   <div className="border-t border-white/5 pt-3 flex justify-between text-sm">
                     <span className="text-slate-400 font-bold">Grand Estimated Total:</span>
                     <span className="text-blue-400 font-extrabold text-right">
-                      {formatCurrency(Math.max(0, cartSubtotal + (paymentMethod === "Showroom Pick-up" ? 0 : 35000) - discountAmount))}
+                      {formatCurrency(Math.max(0, cartSubtotal + (paymentMethod === "Store Pick-up" ? 0 : 35000) - discountAmount))}
                     </span>
                   </div>
                 </div>

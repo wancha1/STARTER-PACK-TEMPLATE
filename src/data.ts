@@ -1,9 +1,9 @@
 import { Service, TrustSignal, Testimonial, Product } from "./types";
 
 export const BUSINESS_INFO = {
-  name: "Apex Devices & Electronics",
-  tagline: "Lira's Premium Hub for Genuine Tech, Gadgets & Accessories",
-  subTagline: "The modern flagship store for genuine tech. Discover high-end smartphones, Apple Silicon MacBooks, crisp 4K displays, and next-gen gaming gear with official brand warranties and immediate local delivery.",
+  name: "Apex Mega Mall",
+  tagline: "Lira's Favorite Online Marketplace for Genuine Tech & Mega Deals",
+  subTagline: "Uganda's fast-growing online retail store for genuine gadgets. Secure extreme discounts on authentic smartphones, Apple Silicon MacBooks, crisp smart screens, and console bundles with doorstep logistics.",
   whatsappNumber: "256708428805", // Standard international format without '+' for API
   whatsappDisplay: "+256 708 428 805",
   email: "sales@apexdevices.ug",
@@ -212,8 +212,8 @@ export const TRUST_SIGNALS: TrustSignal[] = [
     iconName: "Share2"
   },
   {
-    title: "Physical Tech Showroom",
-    description: "Want to hold and try before buying? Visit our flagship showroom on Juba Road, Lira to test live demo models.",
+    title: "Lira Pickup Station",
+    description: "Prefer to collect it yourself? Buy online and pick up instantly at our central Juba Road distributor hub.",
     iconName: "Users"
   }
 ];

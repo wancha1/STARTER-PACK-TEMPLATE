@@ -1,240 +1,314 @@
-import { ArrowRight, MessageSquare, BadgeCheck, Zap, Laptop, Clock } from "lucide-react";
-import { BUSINESS_INFO, STATS } from "../data";
-import { motion } from "motion/react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import { ArrowRight, MessageSquare, BadgeCheck, Zap, Laptop, Clock, Smartphone, Tv, Gamepad2, Headphones, Shield, HelpCircle, Gift } from "lucide-react";
+import { BUSINESS_INFO } from "../data";
+import { useCart } from "../context/CartContext";
+import { motion, AnimatePresence } from "motion/react";
 
 export default function Hero() {
+  const { activeCategory, setActiveCategory } = useCart();
+  const [currentSlide, setCurrentSlide] = useState(0);
   const [timeStr, setTimeStr] = useState("07:21:10");
 
   useEffect(() => {
-    // Show current Uganda local time (UTC+3) format nicely
-    const updateUgTime = () => {
+    // Show current local time nice and clean
+    const updateTime = () => {
       const ugTime = new Date(new Date().getTime() + (new Date().getTimezoneOffset() + 180) * 60000);
       const hours = String(ugTime.getHours()).padStart(2, "0");
       const minutes = String(ugTime.getMinutes()).padStart(2, "0");
       const seconds = String(ugTime.getSeconds()).padStart(2, "0");
       setTimeStr(`${hours}:${minutes}:${seconds}`);
     };
-    const interval = setInterval(updateUgTime, 1000);
-    updateUgTime();
+    const interval = setInterval(updateTime, 1000);
+    updateTime();
     return () => clearInterval(interval);
   }, []);
 
-  const handleWhatsAppConsultation = () => {
-    const defaultMsg = encodeURIComponent(`Hello ${BUSINESS_INFO.name}, I checked your online tech showroom. I am looking to get pricing and check stock availability for a premium device upgrade!`);
+  // Premium blue/purple/indigo sliding promotions
+  const slides = [
+    {
+      title: "APEX PREMIER SAVINGS",
+      tagline: "High-End Gadgets & Top Deals",
+      description: "Discover verified genuine flagship electronics in Uganda. Brand new sealed smartphones, official Apple MacBooks, and high-performance headsets with full warranties.",
+      accentText: "Phones Super Week",
+      cta: "Explore Tech Deals",
+      image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80",
+      color: "from-blue-600 to-indigo-800",
+      badge: "SAME-DAY DELIVERY"
+    },
+    {
+      title: "OFFICIAL BRANDS EXTRAVAGANZA",
+      tagline: "Ultra high-speed M3 Laptops",
+      description: "Empower your corporate office or design workflow. Premium metal chassis business notebooks pre-packaged with free waterproof cases and local office suites.",
+      accentText: "Save up to 600K UGX",
+      cta: "Browse Computing",
+      image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=80",
+      color: "from-blue-600 to-indigo-700",
+      badge: "OFFICIAL WARRANTY"
+    },
+    {
+      title: "HOME CINEMA & GAMING BUNDLES",
+      tagline: "4K Frameless Screens & PS5 Consoles",
+      description: "Transform your living room or entertainment lounge. Get same-day mounting layouts with digital surge protectors and multiple titles preloaded free.",
+      accentText: "Limited Stock Units",
+      cta: "Explore Home Tech",
+      image: "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&w=800&q=80",
+      color: "from-purple-600 to-indigo-800",
+      badge: "FREE WALL MOUNT"
+    }
+  ];
+
+  // Auto-rotate carousel slides like Jumia's main page slider
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [slides.length]);
+
+  const handleWhatsAppConsultation = (customProductText = "") => {
+    const defaultMsg = encodeURIComponent(
+      customProductText 
+        ? `Hi ${BUSINESS_INFO.name}! I am browsing your Jumia-style online storefront and want to secure stock availability for: ${customProductText}`
+        : `Hello ${BUSINESS_INFO.name}! 👋 I am browsing your online e-commerce catalog for Lira, Uganda. I am looking to place a secure order with express doorstep dispatch!`
+    );
     window.open(`https://wa.me/${BUSINESS_INFO.whatsappNumber}?text=${defaultMsg}`, "_blank");
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.1,
-      },
-    },
-  };
+  const categoriesList = [
+    { name: "Phones", label: "Smartphones & Tablets", icon: Smartphone },
+    { name: "Laptops", label: "Computing & Business", icon: Laptop },
+    { name: "TVs & Audio", label: "Smart screens & Sound", icon: Tv },
+    { name: "Gaming", label: "Consoles & Controllers", icon: Gamepad2 },
+    { name: "Accessories", label: "Caretags & Chargers", icon: Headphones }
+  ];
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6, ease: "easeOut" },
-    },
+  const handleCategoryChoice = (categoryName: string) => {
+    setActiveCategory(categoryName);
+    const element = document.getElementById("services");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   };
 
   return (
     <section
       id="hero"
-      className="relative pt-32 pb-24 md:pt-40 md:pb-32 overflow-hidden bg-grid-white text-left"
+      className="relative pt-24 md:pt-32 pb-12 bg-[#020205] overflow-hidden"
     >
-      {/* Decorative Blur Blobs - Frosted Style */}
-      <div className="absolute top-[-10%] left-[-10%] w-[45%] h-[45%] bg-blue-600/15 rounded-full blur-[120px] -z-10" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[45%] h-[45%] bg-purple-600/15 rounded-full blur-[120px] -z-10 animate-pulse duration-4000" />
+      {/* Decorative Blur Blobs */}
+      <div className="absolute top-0 left-[-5%] w-[35%] h-[35%] bg-purple-500/10 rounded-full blur-[100px] pointer-events-none -z-10" />
+      <div className="absolute bottom-0 right-[-5%] w-[40%] h-[40%] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none -z-10" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        
+        {/* Jumia Style Retail Grid Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
           
-          {/* Hero Left Content */}
-          <motion.div
-            className="lg:col-span-12 xl:col-span-7 flex flex-col align-start text-left"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {/* Location Tag */}
-            <motion.div variants={itemVariants} className="inline-flex self-start items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-wider mb-6">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+          {/* 1. Left Sidebar: Jumia-style Categories Directory */}
+          <div className="hidden lg:col-span-3 lg:flex flex-col bg-neutral-950/80 border border-white/5 rounded-2xl p-4 text-left justify-between min-h-[400px]">
+            <div className="space-y-1">
+              <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest font-bold block mb-3 px-2">
+                STORE DEPARTMENTS
               </span>
-              Lira, Uganda | Premium Flagship
-            </motion.div>
+              {categoriesList.map((cat) => {
+                const IconComp = cat.icon;
+                const isSelected = activeCategory === cat.name;
+                return (
+                  <button
+                    key={cat.name}
+                    onClick={() => handleCategoryChoice(cat.name)}
+                    className={`w-full flex items-center gap-3.5 px-3 py-3 rounded-xl transition-all cursor-pointer text-left ${
+                      isSelected 
+                        ? "bg-blue-500/10 border border-blue-500/20 text-blue-400" 
+                        : "text-slate-300 hover:text-white hover:bg-white/5 border border-transparent"
+                    }`}
+                  >
+                    <IconComp className={`w-4 h-4 shrink-0 ${isSelected ? "text-blue-400" : "text-slate-400"}`} />
+                    <div className="min-w-0">
+                      <div className="text-xs font-semibold leading-tight">{cat.name}</div>
+                      <div className="text-[9px] text-slate-500 truncate leading-none mt-0.5">{cat.label}</div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
 
-            {/* Main Headline */}
-            <motion.h1
-              variants={itemVariants}
-              className="text-4xl sm:text-5xl md:text-7xl font-display font-extrabold leading-[1.05] tracking-tight text-white mb-6"
-            >
-              Discover Ultimate Genuine Gadgets & {" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
-                Premium Tech
-              </span>
-            </motion.h1>
+            <div className="border-t border-white/5 pt-4 mt-4 px-2 select-none">
+              <div className="flex items-center gap-2 mb-1.5">
+                <Shield className="w-3.5 h-3.5 text-blue-400" />
+                <span className="text-[9px] font-mono font-bold text-white uppercase tracking-wider">
+                  Verified Seller Protection
+                </span>
+              </div>
+              <p className="text-[9px] text-slate-500 leading-normal font-sans">
+                100% Genuine, sealed boxes only. Secure Mobile Money escrow refund flows.
+              </p>
+            </div>
+          </div>
 
-            {/* Supporting Intro */}
-            <motion.p
-              variants={itemVariants}
-              className="text-lg text-slate-400 font-light leading-relaxed max-w-2xl mb-8"
-            >
-              {BUSINESS_INFO.subTagline} Backed by immediate local customer support, certified warranties, and instant mobile money refund flows.
-            </motion.p>
-
-            {/* CTA buttons */}
-            <motion.div
-              variants={itemVariants}
-              className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-10"
-            >
-              <button
-                id="hero-cta-whatsapp"
-                onClick={handleWhatsAppConsultation}
-                className="px-8 py-4 rounded-2xl font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-3 cursor-pointer shadow-xl shadow-blue-600/20"
+          {/* 2. Middle Column: Jumia-style Main Promotion Banner Carousel */}
+          <div className="col-span-1 lg:col-span-7 relative bg-neutral-900 border border-white/5 rounded-2xl overflow-hidden min-h-[350px] md:min-h-[440px] flex flex-col justify-end p-6 md:p-10 text-left">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentSlide}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.45, ease: "easeInOut" }}
+                className="absolute inset-0 z-0 flex items-center justify-center"
               >
-                <MessageSquare className="w-5 h-5 text-blue-100" />
-                <span>Order on WhatsApp</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-              <a
-                id="hero-secondary-services"
-                href="#services"
-                className="px-6 py-4 rounded-2xl font-semibold text-white bg-white/5 border border-white/10 backdrop-blur-md hover:bg-white/10 hover:border-white/20 transition-all duration-200 flex items-center justify-center gap-2 text-center"
-              >
-                View Tech Categories
-              </a>
-            </motion.div>
+                {/* Image overlay backdrop with gradient */}
+                <div className={`absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-900/60 to-transparent z-10`} />
+                <img
+                  src={slides[currentSlide].image}
+                  className="w-full h-full object-cover opacity-30 select-none pointer-events-none"
+                  alt=""
+                />
+              </motion.div>
+            </AnimatePresence>
 
-            {/* Quick trust metrics */}
-            <motion.div
-              variants={itemVariants}
-              className="grid grid-cols-2 md:grid-cols-2 gap-4 max-w-lg border-t border-white/10 pt-8"
-            >
-              <div className="flex items-center gap-2.5">
-                <BadgeCheck className="w-5 h-5 text-blue-400 shrink-0" />
-                <span className="text-sm font-medium text-slate-300">100% Genuine Sealed Brands</span>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <Zap className="w-5 h-5 text-purple-400 shrink-0" />
-                <span className="text-sm font-medium text-slate-300">Official Local Brand Warranties</span>
-              </div>
-            </motion.div>
-          </motion.div>
-
-          {/* Hero Right Content - Futuristic Interactive Mockup Dashboard */}
-          <motion.div
-            className="lg:col-span-12 xl:col-span-5 relative"
-            initial={{ opacity: 0, scale: 0.92, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
-          >
-            {/* Graphic card borders */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/10 to-purple-600/10 rounded-[2rem] blur-2xl -z-10" />
-
-            {/* Device frame Mockup - Frosted Glass Container */}
-            <div className="w-full bg-white/4 border border-white/10 backdrop-blur-md rounded-[2rem] overflow-hidden p-6 max-w-md mx-auto shadow-2xl shadow-black/40 relative text-left">
-              {/* Top notch detail */}
-              <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-5">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500/80" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-                  <div className="w-3 h-3 rounded-full bg-green-500/80" />
-                </div>
-                <div className="flex items-center gap-2 font-mono text-[11px] text-slate-400">
-                  <Laptop className="w-3.5 h-3.5" />
-                  <span>{BUSINESS_INFO.name.toLowerCase().replace(/\s+/g, "_")}_live_catalog.ts</span>
-                </div>
-                <div className="flex items-center gap-1.5 font-mono text-[11px] text-blue-300 bg-blue-500/10 px-2 py-0.5 rounded-sm">
-                  <Clock className="w-2.5 h-2.5" />
-                  <span>{timeStr} EAT</span>
-                </div>
+            <div className="relative z-10 max-w-xl space-y-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="px-2.5 py-1 text-[9px] font-mono font-extrabold bg-blue-500 text-white rounded uppercase tracking-wider">
+                  {slides[currentSlide].badge}
+                </span>
+                <span className="px-2.5 py-1 text-[9px] font-mono font-bold bg-white/10 text-slate-300 border border-white/10 rounded uppercase tracking-wider">
+                  LIRA OUTLET DEAL
+                </span>
               </div>
 
-              {/* Status Header */}
-              <div className="bg-white/4 border border-white/8 rounded-2xl p-4 mb-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs uppercase font-mono tracking-wider text-slate-300">Showroom Status</span>
-                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-mono">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-                    DISPATCH HOUSE ACTIVE
-                  </span>
-                </div>
-                <div className="grid grid-cols-2 gap-2 mt-3">
-                  <div className="bg-white/3 p-2.5 rounded-xl border border-white/5">
-                    <div className="text-sm font-display font-extrabold text-white">Lira Juba Rd</div>
-                    <div className="text-[9px] text-slate-500 uppercase tracking-tight">Main Retail Showroom</div>
-                  </div>
-                  <div className="bg-white/3 p-2.5 rounded-xl border border-white/5">
-                    <div className="text-sm font-display font-extrabold text-blue-400">Same-Day</div>
-                    <div className="text-[9px] text-slate-500 uppercase tracking-tight">Dispatch Home Delivery</div>
-                  </div>
-                </div>
+              <div>
+                <span className="text-xs font-mono font-bold text-blue-400 uppercase tracking-widest block mb-1">
+                  {slides[currentSlide].title}
+                </span>
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-extrabold text-white leading-[1.1] tracking-tight">
+                  {slides[currentSlide].tagline}
+                </h2>
               </div>
 
-              {/* Live order mockup visualization */}
-              <div className="bg-white/4 border border-white/8 rounded-2xl p-4">
-                <h4 className="font-mono text-xs text-purple-300 mb-3 uppercase tracking-wider">Fast 3-Step WhatsApp Order Cycle</h4>
-                
-                <div className="space-y-3 font-mono text-[11px]">
-                  {/* Step 1 */}
-                  <div className="flex items-start gap-2 bg-blue-500/10 p-2.5 rounded-xl border border-blue-500/10 text-blue-200">
-                    <span className="bg-blue-500/20 text-blue-300 font-bold px-1.5 rounded text-[10px]">1</span>
-                    <div>
-                      <p className="font-medium text-white">Select Product Configuration</p>
-                      <p className="text-slate-400 text-[10px] mt-0.5">Pick phone, laptop, or display and accessories</p>
-                    </div>
-                  </div>
+              <p className="text-slate-300 text-xs sm:text-sm font-light leading-relaxed font-sans max-w-lg">
+                {slides[currentSlide].description}
+              </p>
 
-                  {/* Step 2 */}
-                  <div className="flex items-start gap-2 bg-purple-500/10 p-2.5 rounded-xl border border-purple-500/10 text-purple-200">
-                    <span className="bg-purple-500/20 text-purple-300 font-bold px-1.5 rounded text-[10px]">2</span>
-                    <div>
-                      <p className="font-medium text-white">Secure WhatsApp Order Form</p>
-                      <p className="text-slate-400 text-[10px] mt-0.5">Click compiles bill detail; instantly alerts dispatcher</p>
-                    </div>
-                  </div>
-
-                  {/* Step 3 */}
-                  <div className="space-y-1.5 pt-1.5 border-t border-white/5">
-                    <div className="flex items-center justify-between text-[10px] text-slate-500">
-                      <span>Delivery Agent Transit Dispatch</span>
-                      <span className="text-emerald-400 font-semibold">Status: IN-FLIGHT</span>
-                    </div>
-                    {/* Progress bar */}
-                    <div className="w-full h-1.5 bg-black/40 rounded-full overflow-hidden">
-                      <div className="h-full bg-gradient-to-r from-blue-400 to-purple-500 rounded-full w-[90%] animate-pulse" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Float decor for high premium look */}
-              <div className="absolute -bottom-4 -left-4 bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-3 shadow-lg flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20 text-yellow-500">
-                  🛡️
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-white">Brand Sealed Protection</div>
-                  <div className="text-[9px] text-slate-500">100% Genuine Certified</div>
-                </div>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+                <button
+                  onClick={() => handleWhatsAppConsultation(slides[currentSlide].title + " - " + slides[currentSlide].tagline)}
+                  className="px-6 py-3.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-green-500/15"
+                >
+                  <MessageSquare className="w-4 h-4 shrink-0" />
+                  <span>{slides[currentSlide].cta}</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => handleCategoryChoice(categoriesList[currentSlide % categoriesList.length].name)}
+                  className="px-5 py-3.5 rounded-xl text-xs font-semibold text-white bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all text-center"
+                >
+                  Quick Show Store
+                </button>
               </div>
             </div>
-          </motion.div>
+
+            {/* Slider Dots */}
+            <div className="absolute right-5 bottom-5 z-10 flex gap-1.5 bg-black/40 backdrop-blur-sm py-1.5 px-3 rounded-full border border-white/5">
+              {slides.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentSlide(idx)}
+                  className={`w-1.5 h-1.5 rounded-full transition-all cursor-pointer ${
+                    currentSlide === idx ? "bg-blue-500 scale-125 w-3" : "bg-white/30 hover:bg-white/50"
+                  }`}
+                  aria-label={`Go to slide ${idx + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* 3. Right Sidebar: Quick Help & Express Services Widgets */}
+          <div className="col-span-1 lg:col-span-2 flex flex-col justify-between gap-3">
+            
+            {/* Widget 1: Fast Delivery Tracker */}
+            <div className="bg-neutral-950/80 border border-white/5 rounded-2xl p-4 text-left flex-1 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <span className="text-[9px] font-mono tracking-wider uppercase text-slate-500 font-bold block">
+                    FAST SHIPPING
+                  </span>
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                </div>
+                <h4 className="text-xs font-bold text-white mb-1">Express Dispatch</h4>
+                <p className="text-[10px] text-slate-400 leading-normal font-sans">
+                  Doorstep shipping within 3 hours directly in Lira.
+                </p>
+              </div>
+              <div className="mt-3 bg-white/3 border border-white/5 p-2 rounded-xl flex items-center justify-between font-mono text-[9px] text-slate-300">
+                <span className="flex items-center gap-1">
+                  <Clock className="w-3 h-3 text-blue-400" />
+                  <span>Time:</span>
+                </span>
+                <span className="font-semibold text-emerald-400">{timeStr} EAT</span>
+              </div>
+            </div>
+
+            {/* Widget 2: Escrow Money refund flow */}
+            <div className="bg-neutral-950/80 border border-white/5 rounded-2xl p-4 text-left flex-1 flex flex-col justify-between">
+              <div>
+                <span className="text-[9px] font-mono tracking-wider uppercase text-slate-500 font-bold block mb-2">
+                  100% SECURE PAY
+                </span>
+                <h4 className="text-xs font-bold text-white mb-1">Mobile Money Escrow</h4>
+                <p className="text-[10px] text-slate-400 leading-normal font-sans">
+                  Pay upon secure physical delivery. Immediate verification and exchange.
+                </p>
+              </div>
+              <div className="mt-2 text-[9px] text-slate-500 uppercase tracking-tight flex items-center gap-1.5 bg-neutral-900 border border-white/5 p-1.5 rounded-lg font-mono">
+                <span className="text-blue-400">✓</span> MTNi / Airtel Cash Cards
+              </div>
+            </div>
+
+            {/* Widget 3: Live Hotline Help */}
+            <div className="bg-gradient-to-tr from-blue-500/10 to-purple-600/10 border border-white/5 rounded-2xl p-4 text-left flex-1 flex flex-col justify-between min-h-[110px]">
+              <div>
+                <span className="text-[9px] font-mono tracking-wider uppercase text-blue-400 font-bold block mb-1">
+                  NEED HELP?
+                </span>
+                <h4 className="text-xs font-bold text-white mb-1">Talk to Lira Team</h4>
+                <p className="text-[10px] text-slate-400 leading-tight font-sans">
+                  Reach out directly to place wholesale orders.
+                </p>
+              </div>
+              <button 
+                onClick={() => handleWhatsAppConsultation()}
+                className="w-full py-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-[10px] font-mono font-bold text-white rounded-xl hover:scale-[1.02] active:scale-95 transition-transform cursor-pointer"
+              >
+                Inquire Hotline
+              </button>
+            </div>
+
+          </div>
 
         </div>
+
+        {/* Quick horizontal benefits banner */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-5 bg-neutral-950/30 border border-white/5 rounded-2xl p-4 text-left sm:text-center select-none font-sans">
+          <div className="flex items-center gap-2 md:justify-center">
+            <BadgeCheck className="w-5 h-5 text-blue-400 shrink-0" />
+            <span className="text-[11px] font-medium text-slate-300">Verified Brand Sealed</span>
+          </div>
+          <div className="flex items-center gap-2 md:justify-center">
+            <Zap className="w-5 h-5 text-purple-400 shrink-0" />
+            <span className="text-[11px] font-medium text-slate-300">Same-Day Lira Delivery</span>
+          </div>
+          <div className="flex items-center gap-2 md:justify-center">
+            <Gift className="w-5 h-5 text-pink-400 shrink-0" />
+            <span className="text-[11px] font-medium text-slate-300">Free Premium Accessories</span>
+          </div>
+          <div className="flex items-center gap-2 md:justify-center">
+            <HelpCircle className="w-5 h-5 text-indigo-400 shrink-0" />
+            <span className="text-[11px] font-medium text-slate-300">24/7 WhatsApp Ordering</span>
+          </div>
+        </div>
+
       </div>
-
-
     </section>
   );
 }

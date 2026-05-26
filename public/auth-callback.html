@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Authenticating with Apex Devices...</title>
+  <style>
+    body {
+      background-color: #05050c;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      text-align: center;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px border rgba(255, 255, 255, 0.08);
+      padding: 2.5rem;
+      border-radius: 20px;
+      max-width: 400px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    h2 {
+      margin-top: 0;
+      color: #3b82f6;
+      font-weight: 700;
+    }
+    p {
+      color: #94a3b8;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .spinner {
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top: 3px solid #3b82f6;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto 0;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Apex Secure Login</h2>
+    <p>Authentication complete. Transferring secure credentials back to Lira Storefront...</p>
+    <div class="spinner"></div>
+  </div>
+
+  <script>
+    // Supabase OAuth callback appends session info as parameters in the hashtag fragment (#access_token=...&refresh_token=...)
+    const hash = window.location.hash || window.location.search;
+    
+    if (window.opener) {
+      window.opener.postMessage({ type: 'OAUTH_AUTH_SUCCESS', hash: hash }, window.location.origin);
+      // Wait a tiny bit then close
+      setTimeout(() => {
+        window.close();
+      }, 800);
+    } else {
+      // If opened outside a popup direct to the home page with the parameters
+      window.location.href = '/' + hash;
+    }
+  </script>
+</body>
+</html>

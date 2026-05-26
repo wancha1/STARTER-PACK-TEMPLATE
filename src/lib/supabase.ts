@@ -1,0 +1,187 @@
+import { createClient } from "@supabase/supabase-js";
+import { Product } from "../types";
+
+const supabaseUrl = ((import.meta as any).env?.VITE_SUPABASE_URL) || "";
+const supabaseAnonKey = ((import.meta as any).env?.VITE_SUPABASE_ANON_KEY) || "";
+
+export const isSupabaseConfigured = 
+  supabaseUrl && 
+  supabaseUrl !== "YOUR_SUPABASE_URL" && 
+  supabaseAnonKey && 
+  supabaseAnonKey !== "YOUR_SUPABASE_ANON_KEY";
+
+let supabaseInstance: ReturnType<typeof createClient> | null = null;
+
+export function getSupabase() {
+  if (!isSupabaseConfigured) {
+    return null;
+  }
+  if (!supabaseInstance) {
+    supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
+  }
+  return supabaseInstance;
+}
+
+export interface SupabaseProduct {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  original_price?: number | null;
+  badge?: string | null;
+  specs: string[];
+  colors: string[];
+  storages: string[];
+  images: string[];
+  videos: string[];
+  stock_status: string;
+  detailed_specs?: any;
+  created_at?: string;
+}
+
+/**
+ * Maps a record from Supabase table 'products' to the frontend 'Product' datatype.
+ * Correctly calculates discount badges and defaults parameters nicely.
+ */
+export function mapSupabaseToFrontend(p: SupabaseProduct): Product {
+  const ds = p.detailed_specs || {};
+  
+  // Calculate discount dynamically if requested: $((original_price - price)/original_price)*100
+  let calculatedBadge = p.badge || undefined;
+  if (p.original_price && p.original_price > p.price) {
+    const discount = Math.round(((p.original_price - p.price) / p.original_price) * 100);
+    if (discount > 0) {
+      calculatedBadge = `${discount}% OFF`;
+    }
+  }
+
+  return {
+    id: p.id,
+    name: p.name,
+    category: p.category,
+    price: p.price,
+    originalPrice: p.original_price || undefined,
+    badge: calculatedBadge,
+    specs: p.specs || [],
+    colors: p.colors || [],
+    storages: p.storages || [],
+    stockStatus: (p.stock_status as any) || "In Stock",
+    images: p.images || [],
+    videos: p.videos || [],
+    description: ds.description || "Authorized manufacturer sealed box. Certified check-in and instantaneous replacements.",
+    rating: parseFloat(ds.rating ?? "5.0") || 5.0,
+    reviewsCount: parseInt(ds.reviewsCount ?? "15") || 15,
+    iconName: ds.iconName || "Smartphone",
+    videoPreview: ds.videoPreview || undefined,
+    detailedSpecs: ds.techSpecs || []
+  };
+}
+
+/**
+ * Maps a frontend 'Product' datatype back to the Supabase table layout format.
+ */
+export function mapFrontendToSupabase(p: Product): Partial<SupabaseProduct> {
+  return {
+    id: p.id,
+    name: p.name,
+    category: p.category,
+    price: p.price,
+    original_price: p.originalPrice || null,
+    badge: p.badge || null,
+    specs: p.specs || [],
+    colors: p.colors || [],
+    storages: p.storages || [],
+    stock_status: p.stockStatus || "In Stock",
+    images: p.images || [],
+    videos: p.videos || [],
+    detailed_specs: {
+      description: p.description,
+      rating: p.rating,
+      reviewsCount: p.reviewsCount,
+      iconName: p.iconName,
+      videoPreview: p.videoPreview,
+      techSpecs: p.detailedSpecs || []
+    }
+  };
+}
+
+// SQL Script instructions to be copy-pasted in Supabase SQL editor by the user/admin
+export const SUPABASE_SETUP_SQL = `-- Create products table
+CREATE TABLE IF NOT EXISTS public.products (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    category TEXT NOT NULL,
+    price DOUBLE PRECISION NOT NULL,
+    original_price DOUBLE PRECISION,
+    badge TEXT,
+    specs TEXT[] DEFAULT '{}'::TEXT[],
+    colors TEXT[] DEFAULT '{}'::TEXT[],
+    storages TEXT[] DEFAULT '{}'::TEXT[],
+    images TEXT[] DEFAULT '{}'::TEXT[],
+    videos TEXT[] DEFAULT '{}'::TEXT[],
+    stock_status TEXT DEFAULT 'In Stock',
+    detailed_specs JSONB DEFAULT '{}'::JSONB,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Enable Row Level Security (RLS) for products
+ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
+
+-- Allow public read access to anyone
+CREATE POLICY "Allow public read access" ON public.products
+    FOR SELECT TO public USING (true);
+
+-- Allow authenticated administrative modifications (insert, update, delete)
+CREATE POLICY "Allow authenticated admin write access" ON public.products
+    FOR ALL TO authenticated USING (true);
+
+-- Create sheet_configs table for managing connected Google Sheets
+CREATE TABLE IF NOT EXISTS public.sheet_configs (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    url_or_id TEXT NOT NULL,
+    sync_interval TEXT DEFAULT 'manual' NOT NULL, -- manual, hour, 6hours, daily
+    category_filter TEXT DEFAULT 'All' NOT NULL, -- restrict to specific category or All
+    is_active BOOLEAN DEFAULT true NOT NULL,
+    last_sync_time TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Enable RLS for sheet_configs
+ALTER TABLE public.sheet_configs ENABLE ROW LEVEL SECURITY;
+
+-- Restrict sheet config read and write ONLY to authenticated admins
+CREATE POLICY "Allow authenticated admins read sheet config" ON public.sheet_configs
+    FOR SELECT TO authenticated USING (true);
+
+CREATE POLICY "Allow authenticated admins write sheet config" ON public.sheet_configs
+    FOR ALL TO authenticated USING (true);
+
+-- Create sheet_sync_logs table for logging audit histories
+CREATE TABLE IF NOT EXISTS public.sheet_sync_logs (
+    id TEXT PRIMARY KEY,
+    sheet_name TEXT NOT NULL,
+    timestamp TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    status TEXT NOT NULL, -- 'success' or 'failed'
+    added_count INTEGER DEFAULT 0 NOT NULL,
+    updated_count INTEGER DEFAULT 0 NOT NULL,
+    skipped_count INTEGER DEFAULT 0 NOT NULL,
+    failed_rows JSONB DEFAULT '[]'::JSONB NOT NULL,
+    log_text TEXT NOT NULL
+);
+
+-- Enable RLS for sheet_sync_logs
+ALTER TABLE public.sheet_sync_logs ENABLE ROW LEVEL SECURITY;
+
+-- Restrict sheets sync logs accessibility to authenticated admins
+CREATE POLICY "Allow authenticated admins read sync logs" ON public.sheet_sync_logs
+    FOR SELECT TO authenticated USING (true);
+
+CREATE POLICY "Allow authenticated admins write sync logs" ON public.sheet_sync_logs
+    FOR ALL TO authenticated USING (true);
+
+-- Storage bucket configuration guidelines:
+-- Please create a storage bucket in your Supabase admin named 'product-media'.
+-- Set it to PUBLIC.
+-- Add storage security policies allowing all public users to READ, and authenticated users to CREATE/WRITE/DELETE.
+`;

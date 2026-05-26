@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Menu, X, MessageSquare, Smartphone, ShoppingBag, Heart, GitCompare, Search } from "lucide-react";
+import { Menu, X, MessageSquare, Smartphone, ShoppingBag, Heart, GitCompare, Search, Bookmark } from "lucide-react";
 import { BUSINESS_INFO } from "../data";
 import { useCart } from "../context/CartContext";
 import { motion, AnimatePresence } from "motion/react";
@@ -28,7 +28,6 @@ export default function Header() {
 
   const navLinks = [
     { name: "Live Catalog", href: "#services" },
-    { name: "Setup Builder", href: "#calculator" },
     { name: "Why Apex", href: "#why-us" },
     { name: "Our Legacy", href: "#about" },
     { name: "Reviews", href: "#testimonials" },
@@ -58,12 +57,12 @@ export default function Header() {
               <span className="font-display font-medium text-white text-lg">A</span>
               <div className="absolute inset-0 rounded-xl bg-gradient-to-tr from-blue-500 to-purple-600 blur opacity-40 group-hover:opacity-100 transition-opacity duration-300 -z-10" />
             </div>
-            <div className="flex flex-col text-left">
-              <span className="font-display font-semibold tracking-tight text-white text-lg leading-tight">
-                Apex Devices
+             <div className="flex flex-col text-left">
+              <span className="font-display font-semibold tracking-tight text-white text-lg leading-tight flex items-center gap-1">
+                Apex <span className="text-blue-400">Devices</span>
               </span>
               <span className="text-[9px] font-mono font-medium text-blue-400 capitalize tracking-wider leading-none">
-                electronics showroom
+                online store
               </span>
             </div>
           </a>
@@ -88,10 +87,10 @@ export default function Header() {
             <button
               onClick={() => setIsSearchOpen(true)}
               className="flex items-center gap-2.5 px-4 py-2 rounded-xl border border-white/5 bg-white/4 hover:bg-white/10 hover:border-white/10 text-slate-400 hover:text-white transition-all cursor-pointer font-sans text-xs group"
-              title="Search Showroom Products"
+              title="Search My Store Products"
               aria-label="Open global search"
             >
-              <Search className="w-4 h-4 text-slate-500 group-hover:text-white transition-colors" />
+              <Search className="w-4 h-4 text-blue-400 group-hover:text-white transition-colors" />
               <span className="text-slate-400 select-none">Search store...</span>
             </button>
 
@@ -102,7 +101,7 @@ export default function Header() {
               title="Open My Wishlist"
               aria-label="Toggle Wishlist"
             >
-              <Heart className={`w-5 h-5 ${wishlist.length > 0 ? "fill-pink-500 text-pink-500" : ""}`} />
+              <Bookmark className={`w-5 h-5 ${wishlist.length > 0 ? "fill-pink-500 text-pink-500" : ""}`} />
               <AnimatePresence>
                 {wishlist.length > 0 && (
                   <motion.span
@@ -120,10 +119,11 @@ export default function Header() {
             {/* E-commerce Cart Icon */}
             <button
               onClick={() => setIsCartOpen(true)}
-              className="relative p-2.5 rounded-xl border border-white/5 bg-white/4 hover:bg-white/10 text-slate-300 hover:text-white transition-all cursor-pointer flex items-center justify-center"
+              className="relative px-3.5 py-2.5 rounded-xl border border-white/5 bg-white/4 hover:bg-white/10 text-slate-300 hover:text-white transition-all cursor-pointer flex items-center gap-2"
               aria-label="Toggle Shopping Cart"
             >
-              <ShoppingBag className="w-5 h-5" />
+              <ShoppingBag className="w-4 h-4 text-blue-400" />
+              <span className="text-xs font-mono font-medium tracking-wide animate-pulse">Cart</span>
               <AnimatePresence>
                 {cartCount > 0 && (
                   <motion.span
@@ -141,10 +141,10 @@ export default function Header() {
             <button
               id="header-cta-whatsapp"
               onClick={handleWhatsAppClick}
-              className="px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 shadow-md shadow-green-500/10 hover:shadow-green-500/20 flex items-center gap-2 cursor-pointer hover:scale-[1.02] transition-all"
+              className="px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 shadow-md shadow-green-500/15 hover:shadow-green-500/25 flex items-center gap-2 cursor-pointer hover:scale-[1.02] transition-all"
             >
               <Smartphone className="w-4 h-4" />
-              WhatsApp Store Catalog
+              WhatsApp Orders
             </button>
           </div>
 
@@ -159,13 +159,13 @@ export default function Header() {
               <Search className="w-4.5 h-4.5" />
             </button>
 
-            {/* Mobile Wishlist heart */}
+            {/* Mobile Wishlist bookmark */}
             <button
               onClick={() => setIsWishlistOpen(true)}
               className="relative p-2 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white transition-all cursor-pointer flex items-center justify-center"
               aria-label="Mobile Wishlist Sidebar"
             >
-              <Heart className={`w-4.5 h-4.5 ${wishlist.length > 0 ? "fill-pink-500 text-pink-500" : ""}`} />
+              <Bookmark className={`w-4.5 h-4.5 ${wishlist.length > 0 ? "fill-pink-500 text-pink-500" : ""}`} />
               {wishlist.length > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-pink-500 text-white rounded-full text-[9px] font-mono font-bold flex items-center justify-center">
                   {wishlist.length}
@@ -176,10 +176,11 @@ export default function Header() {
             {/* Mobile Shopping Cart trigger */}
             <button
               onClick={() => setIsCartOpen(true)}
-              className="relative p-2 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white transition-all cursor-pointer flex items-center justify-center"
+              className="relative px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white transition-all cursor-pointer flex items-center gap-1.5"
               aria-label="Mobile Shopping Cart"
             >
-              <ShoppingBag className="w-5 h-5" />
+              <ShoppingBag className="w-4 h-4" />
+              <span className="text-xs font-mono font-medium">Cart</span>
               {cartCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white rounded-full text-[9px] font-mono font-bold flex items-center justify-center">
                   {cartCount}

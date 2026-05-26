@@ -216,7 +216,7 @@ export default function SearchModal() {
 
                   <div>
                     <span className="text-[10px] uppercase font-mono tracking-widest text-[#25D366] font-bold block mb-3">
-                      Recommended Showroom Queries
+                      Recommended Store Queries
                     </span>
                     <div className="flex flex-wrap gap-2">
                       {["Pro Max", "Sealed Box", "M3 MacBook", "4K HDR TV", "Slim Console", "UGX 3,000,000+"].map((rec) => (
@@ -254,12 +254,12 @@ export default function SearchModal() {
                     No results found for "{query}"
                   </h5>
                   <p className="text-xs text-slate-400 font-light leading-relaxed font-sans mb-6">
-                    We couldn't locate any items matching your exact query. Try refining your spelling or contact our Juba Road showroom team to check off-catalog custom orders of genuine devices.
+                    We couldn't locate any items matching your exact query. Try refining your spelling or contact our Juba Road team to check off-catalog custom orders of genuine devices.
                   </p>
 
                   <a
                     href={`https://wa.me/${BUSINESS_INFO.whatsappNumber}?text=${encodeURIComponent(
-                      `Hi Apex Devices! I was searching your Juba Road showroom catalog for "${query}" but didn't find any direct matches. Could you check if this item is currently available in your warehouse or if you have incoming stock for it?`
+                      `Hi Apex Devices! I was searching your Juba Road catalog for "${query}" but didn't find any direct matches. Could you check if this item is currently available in your warehouse or if you have incoming stock for it?`
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -274,7 +274,7 @@ export default function SearchModal() {
                 results.length > 0 && (
                   <div className="space-y-3.5 pb-12 text-left animate-fade-in">
                     <div className="flex items-center justify-between text-[10px] uppercase font-mono tracking-wider text-slate-500 mb-3">
-                      <span>Available Showroom matches ({results.length})</span>
+                      <span>Available Store Matches ({results.length})</span>
                       <span className="hidden sm:inline">Use ↑ ↓ arrow keys to navigate</span>
                     </div>
 
@@ -348,7 +348,7 @@ export default function SearchModal() {
               <span className="flex items-center gap-1.5">
                 <span>Press <strong className="text-slate-400 font-medium">ESC</strong> to exit context</span>
               </span>
-              <span className="text-[#25D366] font-semibold">⚡ Ultimate Showroom Search</span>
+              <span className="text-[#25D366] font-semibold">⚡ Ultimate Store Search</span>
             </div>
           </div>
         </motion.div>

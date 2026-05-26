@@ -1,5 +1,5 @@
 import { useCart } from "../context/CartContext";
-import { X, ShoppingBag, Trash2, Heart, Smartphone, Watch, Laptop, Tv, Gamepad2, Headphones, Camera, Speaker } from "lucide-react";
+import { X, ShoppingBag, Trash2, Heart, Smartphone, Watch, Laptop, Tv, Gamepad2, Headphones, Camera, Speaker, Bookmark } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
 const getProductIcon = (iconName: string) => {
@@ -62,7 +62,7 @@ export default function WishlistDrawer() {
               <div className="px-6 pb-6 border-b border-white/10 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-9 h-9 rounded-xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-pink-400">
-                    <Heart className="w-5 h-5 fill-pink-500" />
+                    <Bookmark className="w-5 h-5 fill-pink-500" />
                   </div>
                   <div className="text-left">
                     <h2 className="text-lg font-display font-bold text-white leading-tight">My Wishlist</h2>
@@ -85,12 +85,12 @@ export default function WishlistDrawer() {
               <div className="flex-1 overflow-y-auto p-6 space-y-4">
                 {wishlist.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center py-20">
-                    <div className="w-16 h-16 rounded-full bg-slate-500/5 border border-slate-500/10 flex items-center justify-center text-slate-500 mb-4 animate-pulse">
-                      <Heart className="w-6 h-6" />
+                    <div className="w-16 h-16 rounded-full bg-slate-500/5 border border-slate-500/10 flex items-center justify-center text-pink-500/40 mb-4 animate-pulse">
+                      <Bookmark className="w-6 h-6 text-pink-500" />
                     </div>
                     <span className="text-sm font-display font-semibold text-slate-300">Your wishlist is empty</span>
                     <p className="text-xs text-slate-500 max-w-xs mt-1.5 font-light font-sans">
-                      Products you heart while shopping the authorized premium Lira store catalog will reflect right here.
+                      Products you bookmark while shopping our Lira mega deals directory will reflect right here.
                     </p>
                     <button
                       onClick={() => setIsWishlistOpen(false)}
@@ -124,7 +124,7 @@ export default function WishlistDrawer() {
                           {item.name}
                         </h4>
                         <div className="flex items-baseline gap-1.5">
-                          <span className="font-mono text-xs font-bold text-orange-400">
+                          <span className="font-mono text-xs font-bold text-blue-400">
                             {formatCurrency(item.price)}
                           </span>
                           {item.originalPrice && (

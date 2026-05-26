@@ -77,14 +77,14 @@ export default function Testimonials() {
             Ready to secure genuine tech with complete peace of mind?
           </h4>
           <p className="text-xs text-slate-400 leading-relaxed font-light mb-6 max-w-2xl mx-auto">
-            Connect directly with our Juba Road showroom sales representatives today to verify real-time inventory levels, request custom delivery setup, or register an official device warranty.
+            Connect directly with our Juba Road sales representatives today to verify real-time inventory levels, request custom delivery setup, or register an official device warranty.
           </p>
           <button
             onClick={handleConsultation}
             className="px-8 py-3.5 rounded-2xl font-bold text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 flex items-center gap-2 cursor-pointer mx-auto hover:scale-[1.02] shadow-xl shadow-green-500/10 transition-transform"
           >
             <Smartphone className="w-4 h-4" />
-            <span>Check Showroom Stock</span>
+            <span>Check Live Stock</span>
           </button>
         </div>
 

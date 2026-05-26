@@ -60,17 +60,15 @@ function MainLayout() {
         {/* Services Showcase & Interactive Calculator */}
         <Services />
 
-        {/* Why Choose Us Trust Indicators Grid */}
-        <WhyChooseUs />
+        {/* Why Choose Us Trust Indicators Grid (Disabled per user request) */}
+        {/* <WhyChooseUs /> */}
 
-        {/* About Us Company Overview & Mission Statements */}
-        <About />
+        {/* About Us and Testimonials sections (Disabled per user request) */}
+        {/* <About /> */}
+        {/* <Testimonials /> */}
 
-        {/* Testimonials Review Cards */}
-        <Testimonials />
-
-        {/* Contact Info & compilable WhatsApp Planner Form & Maps Embed */}
-        <Contact />
+        {/* Contact Info & compilable WhatsApp Planner Form & Maps Embed (Disabled per user request) */}
+        {/* <Contact /> */}
 
         {/* Bulk e-commerce inventory importer */}
         {showMerchantAdmin && <BulkImporter />}

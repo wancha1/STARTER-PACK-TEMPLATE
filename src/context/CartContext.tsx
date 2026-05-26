@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 import { ShoppingBag, Heart, Bookmark, CheckCircle, X, Sparkles, ArrowRight } from "lucide-react";
 import { Product, CartItem } from "../types";
 import { PRODUCTS } from "../data";
+import { getSupabase, isSupabaseConfigured, mapSupabaseToFrontend } from "../lib/supabase";
 
 interface CartContextType {
   activeNotification: {
@@ -22,12 +23,13 @@ interface CartContextType {
   cartCount: number;
   cartSubtotal: number;
 
-  // Dynamic Product Catalog states loaded from public/products/products.json
+  // Dynamic Product Catalog states loaded from public/products/products.json or Supabase
   products: Product[];
   setProducts: (products: Product[]) => void;
   isProductsLoading: boolean;
   productsError: string | null;
   addCustomProducts: (newProducts: Product[]) => void;
+  refreshCatalog: () => Promise<void>;
 
   // Wishlist Feature
   wishlist: Product[];
@@ -35,6 +37,11 @@ interface CartContextType {
   isInWishlist: (productId: string) => boolean;
   isWishlistOpen: boolean;
   setIsWishlistOpen: (open: boolean) => void;
+
+  // Likes Feature
+  likedProductIds: string[];
+  toggleLike: (productId: string) => void;
+  isLiked: (productId: string) => boolean;
 
   // Compare Feature
   compareList: Product[];
@@ -57,6 +64,11 @@ interface CartContextType {
   // Search Modal Feature
   isSearchOpen: boolean;
   setIsSearchOpen: (open: boolean) => void;
+
+  // Supabase Auth Properties
+  adminUser: any | null;
+  setAdminUser: (user: any | null) => void;
+  isSupabaseActive: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -67,32 +79,117 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [isProductsLoading, setIsProductsLoading] = useState<boolean>(true);
   const [productsError, setProductsError] = useState<string | null>(null);
 
+  // Supabase Admin User State
+  const [adminUser, setAdminUser] = useState<any | null>(null);
+
+  // Monitor Supabase Auth changes
+  useEffect(() => {
+    const supabase = getSupabase();
+    if (supabase) {
+      // Get initial session
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        setAdminUser(session?.user ?? null);
+      });
+
+      // Listen for auth events
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        setAdminUser(session?.user ?? null);
+      });
+
+      return () => {
+        subscription.unsubscribe();
+      };
+    }
+  }, []);
+
+  // Listen for Google Auth callback message from popup
+  useEffect(() => {
+    const handleGoogleAuthMessage = async (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) {
+        return;
+      }
+
+      if (event.data?.type === "OAUTH_AUTH_SUCCESS") {
+        const hash = event.data.hash;
+        if (hash) {
+          const supabase = getSupabase();
+          if (supabase) {
+            const cleanedHash = hash.replace(/^[#\?]/, "");
+            const params = new URLSearchParams(cleanedHash);
+            const access_token = params.get("access_token");
+            const refresh_token = params.get("refresh_token");
+
+            if (access_token && refresh_token) {
+              const { error } = await supabase.auth.setSession({
+                access_token,
+                refresh_token,
+              });
+              if (error) {
+                console.error("Error setting session from OAuth hash:", error.message);
+              }
+            }
+          }
+        }
+      }
+    };
+
+    window.addEventListener("message", handleGoogleAuthMessage);
+    return () => {
+      window.removeEventListener("message", handleGoogleAuthMessage);
+    };
+  }, []);
+
+  async function loadProducts() {
+    try {
+      setIsProductsLoading(true);
+      setProductsError(null);
+
+      const supabase = getSupabase();
+      if (supabase) {
+        // Fetch from Supabase Products Table
+        const { data: sbData, error: sbError } = await supabase
+          .from("products")
+          .select("*")
+          .order("created_at", { ascending: false });
+
+        if (!sbError && sbData && sbData.length > 0) {
+          const mapped = sbData.map(mapSupabaseToFrontend);
+          setProducts(mapped);
+          setIsProductsLoading(false);
+          return;
+        } else if (sbError) {
+          console.warn("Supabase query error occurred, falling back to local files:", sbError);
+        }
+      }
+
+      // Fallback: Fetch local products.json
+      const res = await fetch("/products/products.json");
+      if (!res.ok) {
+        throw new Error(`Failed to load product database (HTTP ${res.status})`);
+      }
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setProducts(data);
+      } else {
+        throw new Error("Invalid product database format");
+      }
+    } catch (err: any) {
+      console.warn("Dynamic product fetch failed. Falling back to static offline content:", err);
+      setProductsError(err.message || "Could not fetch dynamic products");
+      setProducts(PRODUCTS);
+    } finally {
+      setIsProductsLoading(false);
+    }
+  }
+
   // Load products dynamically on mount
   useEffect(() => {
-    async function loadProducts() {
-      try {
-        setIsProductsLoading(true);
-        const res = await fetch("/products/products.json");
-        if (!res.ok) {
-          throw new Error(`Failed to load product database (HTTP ${res.status})`);
-        }
-        const data = await res.json();
-        if (Array.isArray(data)) {
-          setProducts(data);
-        } else {
-          throw new Error("Invalid product database format");
-        }
-      } catch (err: any) {
-        console.warn("Dynamic product fetch failed. Falling back to local static cache:", err);
-        setProductsError(err.message || "Could not fetch dynamic products");
-        // Fallback to static offline config gracefully
-        setProducts(PRODUCTS);
-      } finally {
-        setIsProductsLoading(false);
-      }
-    }
     loadProducts();
   }, []);
+
+  const refreshCatalog = async () => {
+    await loadProducts();
+  };
 
   const addCustomProducts = (newProducts: Product[]) => {
     setProducts((prev) => {
@@ -146,6 +243,35 @@ export function CartProvider({ children }: { children: ReactNode }) {
   });
 
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
+
+  // Load and save Likes state
+  const [likedProductIds, setLikedProductIds] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem("apex_likes");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem("apex_likes", JSON.stringify(likedProductIds));
+  }, [likedProductIds]);
+
+  const toggleLike = (productId: string) => {
+    setLikedProductIds((prev) => {
+      const exists = prev.includes(productId);
+      if (exists) {
+        return prev.filter((id) => id !== productId);
+      } else {
+        return [...prev, productId];
+      }
+    });
+  };
+
+  const isLiked = (productId: string) => {
+    return likedProductIds.includes(productId);
+  };
 
   // Compare state
   const [compareList, setCompareList] = useState<Product[]>([]);
@@ -316,6 +442,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
         isInWishlist,
         isWishlistOpen,
         setIsWishlistOpen,
+        likedProductIds,
+        toggleLike,
+        isLiked,
         compareList,
         toggleCompare,
         isInCompare,
@@ -330,6 +459,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setShowMerchantAdmin,
         isSearchOpen,
         setIsSearchOpen,
+        refreshCatalog,
+        adminUser,
+        setAdminUser,
+        isSupabaseActive: isSupabaseConfigured,
       }}
     >
       {selectedHtmlIdFix(children)}

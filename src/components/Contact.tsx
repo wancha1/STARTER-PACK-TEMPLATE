@@ -29,7 +29,7 @@ My name is *${formData.name}* ${formData.deliveryArea ? `located at *${formData.
 I am looking to buy/reserve: *${formData.selectedItem}*
 Inquiry Details: "${formData.message}"
 
-Please let me know if this is currently in stock at the showroom so we can finalize delivery!`;
+Please let me know if this is currently in stock so we can finalize delivery!`;
 
     // Wait a brief simulated moment to make it look professional
     setTimeout(() => {
@@ -62,7 +62,7 @@ Please let me know if this is currently in stock at the showroom so we can final
             Reserve Your Next Premium Device
           </h3>
           <p className="text-slate-400 font-light leading-relaxed">
-            Fill out our active showroom stock inquiry form or reach out directly to chat with our Lira-based sales representative.
+            Fill out our active stock inquiry form or reach out directly to chat with our Lira-based sales representative.
           </p>
         </div>
 
@@ -116,7 +116,7 @@ Please let me know if this is currently in stock at the showroom so we can final
                     <Mail className="w-5 h-5" />
                   </div>
                   <div>
-                    <span className="text-[10px] uppercase font-mono text-slate-500 block tracking-tight">Showroom Digital Mailbox</span>
+                    <span className="text-[10px] uppercase font-mono text-slate-500 block tracking-tight">Support Email Address</span>
                     <span className="text-sm font-semibold text-white font-mono">{BUSINESS_INFO.email}</span>
                   </div>
                 </button>
@@ -127,7 +127,7 @@ Please let me know if this is currently in stock at the showroom so we can final
                     <MapPin className="w-5 h-5" />
                   </div>
                   <div>
-                    <span className="text-[10px] uppercase font-mono text-slate-500 block tracking-tight">Lira Showroom Lounge</span>
+                    <span className="text-[10px] uppercase font-mono text-slate-500 block tracking-tight">Lira Retail Office</span>
                     <span className="text-xs text-white leading-relaxed">{BUSINESS_INFO.address}</span>
                   </div>
                 </div>
@@ -138,7 +138,7 @@ Please let me know if this is currently in stock at the showroom so we can final
             <div className="bg-white/3 border border-white/5 p-4 rounded-xl">
               <span className="text-[10px] font-mono font-bold text-blue-400 block uppercase mb-1">Stock Dispatch Hours</span>
               <p className="text-[11px] text-slate-400 font-light leading-relaxed">
-                Active showroom sales are open Mondays through Saturdays from 08:30 AM to 06:30 PM East African Time. Fast doorstep delivery dispatch operates until 05:30 PM daily.
+                Active retail sales are open Mondays through Saturdays from 08:30 AM to 06:30 PM East African Time. Fast doorstep delivery dispatch operates until 05:30 PM daily.
               </p>
             </div>
 
@@ -149,7 +149,7 @@ Please let me know if this is currently in stock at the showroom so we can final
             
             <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-mono mb-4">
               <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-              Dynamic Showroom Catalog Request
+              Dynamic Store Catalog Request
             </span>
 
             <h4 className="font-display font-bold text-white text-lg mb-4">

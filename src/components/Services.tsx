@@ -86,7 +86,10 @@ export default function Services() {
     selectedQuickViewProduct,
     setSelectedQuickViewProduct,
     products,
-    isProductsLoading
+    isProductsLoading,
+    setIsCartOpen,
+    toggleLike,
+    isLiked
   } = useCart();
 
   // Midnight Countdown
@@ -240,7 +243,7 @@ export default function Services() {
     const colorSelected = selection.color || (product.colors && product.colors[0]) || "Standard Seal";
     const capacitySelected = selection.storage || (product.storages && product.storages[0]) || "Standard Base";
 
-    const customMessage = `Hello ${BUSINESS_INFO.name}! 👋 I am inquiring about a premium order from your online showroom:
+    const customMessage = `Hello ${BUSINESS_INFO.name}! 👋 I am inquiring about a premium order from your online store:
     
 🛍️ *Model:* ${product.name}
 🎨 *Shade:* ${colorSelected}
@@ -281,7 +284,7 @@ Please confirm stock eligibility so I can arrange doorstep dispatch at Juba Road
 🚚 *Lira Whiteglove Setup (+50k):* ${includeSetupAndDelivery ? "Yes, Active" : "No, Pickup"}
 📈 *Bespoke Quote:* ${formatCurrency(getSuitePrice())}
 
-Please assign a tech concierge to review stock and showroom delivery schedules at my convenience!`;
+Please assign a tech concierge to review stock and delivery schedules at my convenience!`;
 
     window.open(`https://wa.me/${BUSINESS_INFO.whatsappNumber}?text=${encodeURIComponent(text)}`, "_blank");
   };
@@ -294,19 +297,16 @@ Please assign a tech concierge to review stock and showroom delivery schedules a
 
       <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
         
-        {/* Apple-styled minimalist Header */}
-        <div className="text-center max-w-4xl mx-auto mb-20 md:mb-28">
-          <span className="text-[11px] font-mono uppercase tracking-[0.2em] text-blue-400 font-semibold mb-4 inline-block">
-            AUTHORIZED APEX FLAGSHOWROOM
+        {/* Jumia-style vibrant marketplace Header */}
+        <div className="text-center max-w-4xl mx-auto mb-16 md:mb-24">
+          <span className="text-[11px] font-mono uppercase tracking-[0.25em] text-blue-400 font-bold mb-3 inline-block">
+            ⚡ APEX DAILY SUPER DEALS
           </span>
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-display font-medium text-white tracking-tight mb-6">
-            Engineered to Inspire. <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-purple-400">
-              Showcased for Lira.
-            </span>
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-display font-extrabold text-white tracking-tight mb-5">
+            Lira's Premium <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Tech Store</span>
           </h2>
-          <p className="text-slate-400 text-base md:text-lg font-light leading-relaxed max-w-2xl mx-auto font-sans">
-            Step into Northern Uganda's most pristine electronic catalog. Authentic luxury sealed brands, official manufacture warranties, and same-day personalized home delivery.
+          <p className="text-slate-400 text-sm sm:text-base md:text-lg font-light leading-relaxed max-w-2xl mx-auto font-sans">
+            Shop the best discounts on Uganda's most popular gadgets. Complete with official brand warranties, instant mobile money escrow, and secure same-day doorstep delivery. No slow catalogs, just express value!
           </p>
         </div>
 
@@ -321,9 +321,9 @@ Please assign a tech concierge to review stock and showroom delivery schedules a
                   key={cat}
                   type="button"
                   onClick={() => setActiveCategory(cat)}
-                  className={`px-5 py-2.5 text-xs font-medium rounded-xl text-center shrink-0 snap-start cursor-pointer transition-all duration-300 ${
+                  className={`px-5 py-2.5 text-xs font-semibold rounded-xl text-center shrink-0 snap-start cursor-pointer transition-all duration-300 ${
                     activeCategory === cat
-                      ? "bg-white text-black font-semibold shadow-xl"
+                      ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold shadow-lg shadow-blue-500/25"
                       : "bg-white/3 hover:bg-white/8 border border-white/5 text-slate-300"
                   }`}
                 >
@@ -335,15 +335,15 @@ Please assign a tech concierge to review stock and showroom delivery schedules a
             {/* Quiet modern query bars */}
             <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center flex-1 lg:max-w-xl md:justify-end">
               <div className="relative flex-1">
-                <span className="absolute inset-y-0 left-3.5 flex items-center text-slate-500">
+                <span className="absolute inset-y-0 left-3.5 flex items-center text-blue-400">
                   <Search className="w-4 h-4" />
                 </span>
                 <input
                   type="text"
-                  placeholder="Inquire products, processors or brands..."
+                  placeholder="Search products, category deals or brands..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full bg-black/50 border border-white/10 text-xs rounded-xl pl-10 pr-4 py-3 text-white outline-none focus:border-white focus:ring-1 focus:ring-white transition-all font-sans"
+                  className="w-full bg-black/50 border border-white/10 text-xs rounded-xl pl-10 pr-4 py-3 text-white outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-sans"
                 />
               </div>
 
@@ -353,12 +353,12 @@ Please assign a tech concierge to review stock and showroom delivery schedules a
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="bg-black/50 border border-white/10 text-xs rounded-xl px-3 py-3 text-white outline-none cursor-pointer focus:border-white transition-all font-sans"
+                  className="bg-black/50 border border-white/10 text-xs rounded-xl px-3 py-3 text-white outline-none cursor-pointer focus:border-blue-500 transition-all font-sans"
                 >
-                  <option value="featured">Pristine Stock</option>
+                  <option value="featured">Best Matches</option>
                   <option value="price_asc">Price: Lowest first</option>
-                  <option value="price_desc">Price: High luxury first</option>
-                  <option value="rating">Top Rated Showroom</option>
+                  <option value="price_desc">Price: Highest first</option>
+                  <option value="rating">Customer Rating</option>
                 </select>
               </div>
             </div>
@@ -442,7 +442,7 @@ Please assign a tech concierge to review stock and showroom delivery schedules a
               <div className="w-16 h-16 rounded-2xl bg-white/5 text-slate-400 flex items-center justify-center mb-5 mx-auto text-xl">
                 ☕
               </div>
-              <h5 className="font-display font-medium text-lg text-white mb-2">No showroom items matched</h5>
+              <h5 className="font-display font-medium text-lg text-white mb-2">No matching items</h5>
               <p className="text-sm text-slate-400 font-light leading-relaxed max-w-sm mx-auto">
                 No active stock matched "{searchTerm}" or fits this specific price bracket. Reach our Juba Road team using WhatsApp to import or customize custom electronic specs!
               </p>
@@ -457,7 +457,7 @@ Please assign a tech concierge to review stock and showroom delivery schedules a
                   "iphone-15 Pro Max": { label: "🔥 Only 2 sealed boxes left!", style: "text-amber-400 bg-amber-500/10 border-amber-500/20" },
                   "galaxy-s24-ultra": { label: "📈 Selling fast in Lira this week", style: "text-blue-400 bg-blue-500/10 border-blue-500/20" },
                   "macbook-pro-m3": { label: "⚡ Free dispatch to Lira/Gulu today", style: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
-                  "sony-ps5-slim": { label: "⏳ Low Showroom Count", style: "text-rose-400 bg-rose-500/10 border-rose-500/20" },
+                  "sony-ps5-slim": { label: "⏳ Low Stock Count", style: "text-rose-400 bg-rose-500/10 border-rose-500/20" },
                 };
                 
                 // fallback rotating logic
@@ -521,35 +521,35 @@ Please assign a tech concierge to review stock and showroom delivery schedules a
                       <span className={`absolute bottom-4 right-4 text-[9px] font-mono tracking-widest uppercase font-semibold px-3 py-1 rounded-xl border backdrop-blur-md ${
                         product.stockStatus === "In Stock"
                           ? "bg-black/60 border-emerald-500/20 text-emerald-400"
-                          : "bg-black/60 border-amber-500/20 text-amber-400"
+                          : "bg-black/60 border-purple-500/20 text-purple-400"
                       }`}>
-                        {product.stockStatus === "In Stock" ? "Showroom Ready" : "Low Stock"}
+                        {product.stockStatus === "In Stock" ? "In Stock" : "Limited Stock"}
                       </span>
 
                       {/* Promo Badging if active */}
                       {product.badge && (
-                        <span className="absolute top-4 left-4 text-[9px] font-mono tracking-wide font-extrabold bg-white text-black uppercase px-2.5 py-1 rounded-lg shadow-lg">
+                        <span className="absolute top-4 left-4 text-[9px] font-mono tracking-wide font-black bg-gradient-to-r from-blue-500 to-indigo-600 text-white uppercase px-2.5 py-1.5 rounded-lg shadow-lg">
                           {product.badge}
                         </span>
                       )}
 
                       {/* Top-Right Premium Interactive Action Row */}
                       <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5">
-                        {/* Functional Like Button (Toggles global wishlist state per user prompt) */}
+                        {/* Functional Like Button (Independent of Wishlist) */}
                         <button
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            toggleWishlist(product);
+                            toggleLike(product.id);
                           }}
                           className={`w-8.5 h-8.5 rounded-full flex items-center justify-center border backdrop-blur-md active:scale-90 transition-all cursor-pointer ${
-                            isInWishlist(product.id)
+                            isLiked(product.id)
                               ? "bg-rose-500/25 border-rose-500/40 text-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.15)] bg-slate-900/40"
                               : "bg-black/50 border-white/5 text-white/80 hover:text-white hover:bg-black/75 hover:border-white/20"
                           }`}
-                          title={isInWishlist(product.id) ? "Unlike item" : "Like item"}
+                          title={isLiked(product.id) ? "Unlike item" : "Like item"}
                         >
-                          <Heart className={`w-3.5 h-3.5 transition-transform duration-300 ${isInWishlist(product.id) ? "fill-rose-500 scale-110 text-rose-500" : ""}`} />
+                          <Heart className={`w-3.5 h-3.5 transition-transform duration-300 ${isLiked(product.id) ? "fill-rose-500 scale-110 text-rose-500" : ""}`} />
                         </button>
 
                         {/* Functional Save to Wishlist Button */}
@@ -561,41 +561,46 @@ Please assign a tech concierge to review stock and showroom delivery schedules a
                           }}
                           className={`w-8.5 h-8.5 rounded-full flex items-center justify-center border backdrop-blur-md active:scale-90 transition-all cursor-pointer ${
                             isInWishlist(product.id)
-                              ? "bg-blue-500/25 border-blue-500/40 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.15)] bg-slate-900/40"
+                              ? "bg-pink-500/15 border-pink-500/30 text-pink-400 shadow-[0_0_15px_rgba(244,63,94,0.1)] bg-slate-900/40"
                               : "bg-black/50 border-white/5 text-white/80 hover:text-white hover:bg-black/75 hover:border-white/20"
                           }`}
                           title={isInWishlist(product.id) ? "Remove from wishlist" : "Add to wishlist"}
                         >
-                          <Bookmark className={`w-3.5 h-3.5 transition-transform duration-300 ${isInWishlist(product.id) ? "fill-blue-400 scale-110 text-blue-400" : ""}`} />
+                          <Bookmark className={`w-3.5 h-3.5 transition-transform duration-300 ${isInWishlist(product.id) ? "fill-pink-500 scale-110 text-pink-500" : ""}`} />
                         </button>
                       </div>
                     </div>
 
                     {/* Meta info & Titles */}
-                    <div className="space-y-1 mb-2.5">
+                    <div className="space-y-1 mb-2.5 text-left">
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-[10px] font-mono tracking-widest text-slate-500 uppercase font-semibold">
+                        <span className="text-[10px] font-mono tracking-widest text-blue-400 uppercase font-bold">
                           {product.category}
                         </span>
+                        {/* Jumia star review tag */}
+                        <div className="flex items-center gap-1 font-mono text-[9px]">
+                          <span className="text-amber-400 font-bold">★</span>
+                          <span className="text-slate-300 font-medium">{product.rating} ({product.reviewsCount || 45})</span>
+                        </div>
                       </div>
                       
                       <h4 
                         onClick={() => setSelectedQuickViewProduct(product)}
-                        className="font-display font-medium text-lg text-white group-hover:text-blue-400 cursor-pointer transition-colors duration-300"
+                        className="font-display font-bold text-lg text-white hover:text-blue-400 cursor-pointer transition-colors duration-300"
                       >
                         {product.name}
                       </h4>
                     </div>
 
                     {/* Scarcity Banner ribbon on card */}
-                    <div className="mb-4">
+                    <div className="mb-4 text-left">
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-mono font-medium ${urgency.style}`}>
                         {urgency.label}
                       </span>
                     </div>
 
                     {/* Feature highlight line - Understated & Minimalist */}
-                    <p className="text-xs font-mono text-slate-400/80 mb-5 leading-relaxed tracking-tight">
+                    <p className="text-xs font-mono text-slate-400/80 mb-5 leading-relaxed tracking-tight text-left">
                       {product.specs.slice(0, 2).join("    ·    ")}
                     </p>
                   </div>
@@ -603,8 +608,8 @@ Please assign a tech concierge to review stock and showroom delivery schedules a
                   {/* Pricing Matrix & Call-to-Action Layout */}
                   <div className="mt-auto space-y-4">
                     <div className="flex items-baseline justify-between gap-2">
-                      <span className="font-mono text-base font-semibold text-white">
-                        {formatCurrency(product.price)}
+                      <span className="font-mono text-base font-bold text-white flex items-center gap-1">
+                        <span className="text-xs text-blue-400">UGX</span> {formatCurrency(product.price).replace("UGX", "").trim() || formatCurrency(product.price)}
                       </span>
                       {product.originalPrice && (
                         <span className="font-mono text-xs text-slate-500 line-through">
@@ -615,11 +620,15 @@ Please assign a tech concierge to review stock and showroom delivery schedules a
 
                     {/* Single unified interactive trigger CTA */}
                     <button
-                      onClick={() => setSelectedQuickViewProduct(product)}
-                      className="w-full py-3.5 px-4 rounded-xl font-medium text-xs tracking-wider uppercase bg-white hover:bg-zinc-100 text-black border border-white hover:border-zinc-100 transition-all cursor-pointer flex items-center justify-center gap-2 group-hover:scale-[1.01]"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        addToCart(product);
+                        setIsCartOpen(true);
+                      }}
+                      className="w-full py-3.5 px-4 rounded-xl font-bold text-xs tracking-wider uppercase bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white border border-blue-500/25 hover:border-blue-500/40 transition-all cursor-pointer flex items-center justify-center gap-2 group-hover:scale-[1.01] shadow-md shadow-blue-500/10"
                     >
-                      <span>Configure & Checkout</span>
-                      <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+                      <ShoppingBag className="w-3.5 h-3.5 text-white" />
+                      <span>Add to Cart</span>
                     </button>
                   </div>
 
@@ -641,7 +650,7 @@ Please assign a tech concierge to review stock and showroom delivery schedules a
               {isLazyLoadingMore ? (
                 <span className="flex items-center gap-2">
                   <span className="w-3.5 h-3.5 rounded-full border border-white border-t-transparent animate-spin inline-block mr-1" />
-                  Scanning Lira Showrooms...
+                  Scanning Lira Stock...
                 </span>
               ) : (
                 "Show More Genuine Devices"
@@ -653,14 +662,15 @@ Please assign a tech concierge to review stock and showroom delivery schedules a
           </div>
         )}
 
-        {/* Minimal Bespoke Workspace & Living Design Concierge (Re-Engineered Calculator alternative) */}
+        {/* Minimal Bespoke Workspace & Living Design Concierge (Re-Engineered Calculator alternative) - DISABLED */}
+        {/*
         <div id="calculator" className="scroll-mt-24 mt-24">
           <div className="bg-gradient-to-b from-neutral-950 to-neutral-900 border border-white/5 rounded-[3rem] p-8 md:p-14 shadow-2xl relative overflow-hidden text-left">
             <div className="absolute top-0 right-0 w-[50%] h-[50%] bg-blue-500/5 rounded-full blur-[140px] pointer-events-none" />
             
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
               
-              {/* Informational intro */}
+              
               <div className="lg:col-span-12 xl:col-span-7 space-y-6">
                 <div>
                   <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-purple-400 font-semibold mb-2 block">
@@ -674,7 +684,7 @@ Please assign a tech concierge to review stock and showroom delivery schedules a
                   </p>
                 </div>
 
-                {/* Turnkey Preset grids */}
+                
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <button
                     onClick={() => setSelectedSuite("command-center")}
@@ -711,7 +721,7 @@ Please assign a tech concierge to review stock and showroom delivery schedules a
                   </button>
                 </div>
 
-                {/* Accessories checkboxes */}
+                
                 <div className="space-y-3 pt-2">
                   <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest font-semibold block">Optional Protection & Care addons:</span>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -737,7 +747,7 @@ Please assign a tech concierge to review stock and showroom delivery schedules a
                 </div>
               </div>
 
-              {/* Package Summary Receipt Card */}
+              
               <div className="lg:col-span-12 xl:col-span-5 relative">
                 <div className="bg-black/60 border border-white/5 rounded-3xl p-6 md:p-8 space-y-6">
                   <div className="flex justify-between items-center border-b border-white/5 pb-4">
@@ -782,6 +792,7 @@ Please assign a tech concierge to review stock and showroom delivery schedules a
             </div>
           </div>
         </div>
+        */}
 
       </div>
 
@@ -829,7 +840,7 @@ Please assign a tech concierge to review stock and showroom delivery schedules a
                         mediaMode === "video" ? "bg-white text-black" : "text-slate-400 hover:text-white"
                       }`}
                     >
-                      🎥 Video Showroom
+                      🎥 Video Demonstration
                     </button>
                   </div>
                 )}
@@ -1009,7 +1020,7 @@ Please assign a tech concierge to review stock and showroom delivery schedules a
                 {/* Genuine Detailed Specs List (from dynamic JSON structure) */}
                 {selectedQuickViewProduct.detailedSpecs && selectedQuickViewProduct.detailedSpecs.length > 0 && (
                   <div className="space-y-2 bg-neutral-950/80 border border-white/5 p-4 rounded-2xl border-dashed border-white/10">
-                    <span className="text-[9px] font-mono uppercase text-teal-400 font-bold block mb-1.5 tracking-wider">🔒 Showroom Specification Sheet:</span>
+                    <span className="text-[9px] font-mono uppercase text-teal-400 font-bold block mb-1.5 tracking-wider">🔒 Technical Specification Sheet:</span>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 font-mono text-[10px]">
                       {selectedQuickViewProduct.detailedSpecs.map((dspec: { label: string; value: string }, idx: number) => (
                         <div key={idx} className="flex justify-between border-b border-white/5 pb-1">
@@ -1080,7 +1091,7 @@ Please assign a tech concierge to review stock and showroom delivery schedules a
                 <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-2xl p-4.5 space-y-2.5 font-mono text-xs text-slate-300">
                   <div className="flex justify-between items-center border-b border-white/5 pb-2 mb-1.5">
                     <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">🛒 Active Dispatch Bill Preview</span>
-                    <span className="text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded-sm uppercase tracking-widest font-bold">Showroom Approved</span>
+                    <span className="text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded-sm uppercase tracking-widest font-bold">Store Certified</span>
                   </div>
                   <div className="flex justify-between gap-4">
                     <span className="text-slate-500">Unit model:</span>
@@ -1095,7 +1106,7 @@ Please assign a tech concierge to review stock and showroom delivery schedules a
                     <span className="text-purple-400 text-right font-medium">{productSelections[selectedQuickViewProduct.id]?.storage || selectedQuickViewProduct.storages?.[0] || "Standard Base"}</span>
                   </div>
                   <div className="flex justify-between pt-2 border-t border-white/5 text-xs">
-                    <span className="text-slate-400 font-sans">Showroom Promo Price:</span>
+                    <span className="text-slate-400 font-sans">Store Promo Price:</span>
                     <span className="text-emerald-400 font-extrabold text-sm">{formatCurrency(selectedQuickViewProduct.price)}</span>
                   </div>
                   <div className="text-[10px] text-slate-500 text-center italic mt-1 font-sans">
@@ -1152,7 +1163,7 @@ Please assign a tech concierge to review stock and showroom delivery schedules a
                     onClick={() => setSelectedQuickViewProduct(null)}
                     className="py-4 px-6 rounded-2xl font-bold bg-white/5 hover:bg-white/10 text-slate-300 text-xs transition-colors cursor-pointer w-full sm:w-auto"
                   >
-                    Back to Showroom
+                    Back to Catalog
                   </button>
                 </div>
 
