@@ -3,6 +3,8 @@ import { ShoppingBag, Heart, Bookmark, CheckCircle, X, Sparkles, ArrowRight } fr
 import { Product, CartItem } from "../types";
 import { PRODUCTS } from "../data";
 import { getSupabase, isSupabaseConfigured, mapSupabaseToFrontend } from "../lib/supabase";
+import { auth as firebaseAuth, googleProvider, signInWithPopup, signOut as firebaseSignOut } from "../lib/firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 interface CartContextType {
   activeNotification: {
@@ -69,6 +71,12 @@ interface CartContextType {
   adminUser: any | null;
   setAdminUser: (user: any | null) => void;
   isSupabaseActive: boolean;
+
+  // Customer Firebase Auth Properties
+  customerUser: any | null;
+  customerLoading: boolean;
+  loginCustomerWithGoogle: () => Promise<void>;
+  logoutCustomer: () => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -81,6 +89,34 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Supabase Admin User State
   const [adminUser, setAdminUser] = useState<any | null>(null);
+
+  // Customer Firebase Auth State
+  const [customerUser, setCustomerUser] = useState<any | null>(null);
+  const [customerLoading, setCustomerLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
+      setCustomerUser(user);
+      setCustomerLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const loginCustomerWithGoogle = async () => {
+    try {
+      await signInWithPopup(firebaseAuth, googleProvider);
+    } catch (error) {
+      console.error("Google Customer Sign-In Error:", error);
+    }
+  };
+
+  const logoutCustomer = async () => {
+    try {
+      await firebaseSignOut(firebaseAuth);
+    } catch (error) {
+      console.error("Google Customer Logout Error:", error);
+    }
+  };
 
   // Monitor Supabase Auth changes
   useEffect(() => {
@@ -463,6 +499,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
         adminUser,
         setAdminUser,
         isSupabaseActive: isSupabaseConfigured,
+        customerUser,
+        customerLoading,
+        loginCustomerWithGoogle,
+        logoutCustomer,
       }}
     >
       {selectedHtmlIdFix(children)}
