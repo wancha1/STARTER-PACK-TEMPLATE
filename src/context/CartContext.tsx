@@ -3,7 +3,15 @@ import { ShoppingBag, Heart, Bookmark, CheckCircle, X, Sparkles, ArrowRight } fr
 import { Product, CartItem } from "../types";
 import { PRODUCTS } from "../data";
 import { getSupabase, isSupabaseConfigured, mapSupabaseToFrontend } from "../lib/supabase";
-import { auth as firebaseAuth, googleProvider, signInWithPopup, signOut as firebaseSignOut } from "../lib/firebase";
+import { 
+  auth as firebaseAuth, 
+  googleProvider, 
+  signInWithPopup, 
+  signOut as firebaseSignOut,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile
+} from "../lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 
 interface CartContextType {
@@ -77,6 +85,8 @@ interface CartContextType {
   customerLoading: boolean;
   loginCustomerWithGoogle: () => Promise<void>;
   logoutCustomer: () => Promise<void>;
+  loginCustomerWithEmail: (email: string, pass: string) => Promise<any>;
+  signUpCustomerWithEmail: (email: string, pass: string, name: string) => Promise<any>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -107,6 +117,30 @@ export function CartProvider({ children }: { children: ReactNode }) {
       await signInWithPopup(firebaseAuth, googleProvider);
     } catch (error) {
       console.error("Google Customer Sign-In Error:", error);
+      throw error;
+    }
+  };
+
+  const loginCustomerWithEmail = async (email: string, pass: string) => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(firebaseAuth, email, pass);
+      return userCredential.user;
+    } catch (error) {
+      console.error("Email Customer Login Error:", error);
+      throw error;
+    }
+  };
+
+  const signUpCustomerWithEmail = async (email: string, pass: string, name: string) => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(firebaseAuth, email, pass);
+      await updateProfile(userCredential.user, { displayName: name });
+      // Force refreshing user profile locally
+      setCustomerUser({ ...userCredential.user, displayName: name });
+      return userCredential.user;
+    } catch (error) {
+      console.error("Email Customer Sign-Up Error:", error);
+      throw error;
     }
   };
 
@@ -503,6 +537,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         customerLoading,
         loginCustomerWithGoogle,
         logoutCustomer,
+        loginCustomerWithEmail,
+        signUpCustomerWithEmail,
       }}
     >
       {selectedHtmlIdFix(children)}

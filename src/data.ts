@@ -4,10 +4,10 @@ export const BUSINESS_INFO = {
   name: "Apex Mega Mall",
   tagline: "Lira's Favorite Online Marketplace for Genuine Tech & Mega Deals",
   subTagline: "Uganda's fast-growing online retail store for genuine gadgets. Secure extreme discounts on authentic smartphones, Apple Silicon MacBooks, crisp smart screens, and console bundles with doorstep logistics.",
-  whatsappNumber: "256708428805", // Standard international format without '+' for API
-  whatsappDisplay: "+256 708 428 805",
+  whatsappNumber: "256772604777", // Standard international format without '+' for API
+  whatsappDisplay: "+256 772 604 777",
   email: "sales@apexdevices.ug",
-  phoneDisplay: "+256 708 428 805",
+  phoneDisplay: "+256 772 604 777",
   address: "Plot 24, Juba Road, Lira, Uganda",
   googleMapsEmbed: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15939.88092770258!2d32.893112089405625!3d2.2497655153284704!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1770c3ba50172e29%3A0xa1ea142345fb12c8!2sLira!5e0!3m2!1sen!2sug!4v1700000000000!5m2!1sen!2sug"
 };

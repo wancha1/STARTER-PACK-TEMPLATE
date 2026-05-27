@@ -1,12 +1,16 @@
-import { useState, useEffect } from "react";
-import { Menu, X, MessageSquare, Smartphone, ShoppingBag, Heart, GitCompare, Search, Bookmark } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Menu, X, MessageSquare, Smartphone, ShoppingBag, Heart, GitCompare, Search, Bookmark, User, LogOut, ChevronDown } from "lucide-react";
 import { BUSINESS_INFO } from "../data";
 import { useCart } from "../context/CartContext";
 import { motion, AnimatePresence } from "motion/react";
+import AuthModal from "./AuthModal";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  
   const { 
     cartCount, 
     setIsCartOpen, 
@@ -15,8 +19,12 @@ export default function Header() {
     compareList, 
     setIsCompareOpen,
     isSearchOpen,
-    setIsSearchOpen
+    setIsSearchOpen,
+    customerUser,
+    logoutCustomer
   } = useCart();
+
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,6 +32,17 @@ export default function Header() {
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const navLinks = [
@@ -52,14 +71,14 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <a href="#" className="flex items-center gap-2 group" id="nav-logo">
-            <div className="relative w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform duration-300">
+          <a href="#" className="flex items-center gap-2 group transition-all duration-300 hover:scale-105" id="nav-logo">
+            <div className="relative w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.6)] transition-all duration-300">
               <span className="font-display font-medium text-white text-lg">A</span>
               <div className="absolute inset-0 rounded-xl bg-gradient-to-tr from-blue-500 to-purple-600 blur opacity-40 group-hover:opacity-100 transition-opacity duration-300 -z-10" />
             </div>
              <div className="flex flex-col text-left">
-              <span className="font-display font-semibold tracking-tight text-white text-lg leading-tight flex items-center gap-1">
-                Apex <span className="text-blue-400">Devices</span>
+              <span className="font-display font-semibold tracking-tight text-white text-lg leading-tight flex items-center gap-1 group-hover:text-blue-300 transition-colors">
+                Apex <span className="text-blue-400 group-hover:text-white transition-colors">Devices</span>
               </span>
               <span className="text-[9px] font-mono font-medium text-blue-400 capitalize tracking-wider leading-none">
                 online store
@@ -73,7 +92,7 @@ export default function Header() {
               <a
                 key={link.name}
                 href={link.href}
-                className="text-gray-300 hover:text-white text-sm font-medium transition-colors duration-200 relative group"
+                className="text-gray-300 hover:text-white text-sm font-medium transition-all duration-300 hover:scale-[1.08] hover:drop-shadow-[0_0_8px_rgba(59,130,246,0.5)] relative group"
               >
                 {link.name}
                 <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-gradient-to-r from-blue-400 to-purple-500 transition-all duration-300 group-hover:w-full" />
@@ -137,6 +156,66 @@ export default function Header() {
                 )}
               </AnimatePresence>
             </button>
+
+            {/* Customer User Account Action Dropdown */}
+            {customerUser ? (
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                  className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-white/5 bg-white/4 hover:bg-white/10 text-slate-300 hover:text-white transition-all cursor-pointer text-xs"
+                  aria-label="User account dropdown"
+                >
+                  {customerUser.photoURL ? (
+                    <img src={customerUser.photoURL} alt="Avatar" referrerPolicy="no-referrer" className="w-4 h-4 rounded-full" />
+                  ) : (
+                    <User className="w-4 h-4 text-purple-400" />
+                  )}
+                  <span className="max-w-[80px] truncate">{customerUser.displayName || "Buyer"}</span>
+                  <ChevronDown className={`w-3 h-3 transition-transform ${isProfileDropdownOpen ? "rotate-180" : ""}`} />
+                </button>
+
+                <AnimatePresence>
+                  {isProfileDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      className="absolute right-0 mt-2 w-56 bg-[#090915] border border-white/10 rounded-2xl p-4 shadow-xl text-left z-50 select-none animate-in fade-in"
+                    >
+                      <div className="pb-2 border-b border-white/5">
+                        <p className="text-xs text-white font-semibold truncate">{customerUser.displayName || "Authorized Buyer"}</p>
+                        <p className="text-[10px] text-slate-400 font-mono mt-0.5 truncate">{customerUser.email}</p>
+                      </div>
+                      <div className="py-2.5">
+                        <div className="text-[9px] font-mono font-medium text-emerald-400 flex items-center gap-1.5 bg-emerald-500/5 px-2 py-1.5 rounded-lg">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                          <span>Order Auth Synced</span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={async () => {
+                          await logoutCustomer();
+                          setIsProfileDropdownOpen(false);
+                        }}
+                        className="w-full flex items-center justify-between text-left text-xs bg-red-500/10 hover:bg-red-500/20 text-red-100 border border-red-500/10 hover:border-red-500/20 p-2 rounded-xl cursor-pointer transition-colors"
+                      >
+                        <span>Sign Out</span>
+                        <LogOut className="w-3.5 h-3.5" />
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <button
+                onClick={() => setIsAuthModalOpen(true)}
+                className="px-3.5 py-2.5 rounded-xl border border-white/5 bg-white/4 hover:bg-white/10 text-slate-300 hover:text-white transition-all cursor-pointer flex items-center gap-1.5 text-xs"
+                aria-label="Sign in customer portal"
+              >
+                <User className="w-4 h-4 text-blue-400" />
+                <span>Sign In</span>
+              </button>
+            )}
 
             <button
               id="header-cta-whatsapp"
@@ -222,7 +301,50 @@ export default function Header() {
                   {link.name}
                 </a>
               ))}
-              <div className="pt-4 px-4">
+
+              {/* Mobile Account Profile Sync Block */}
+              <div className="pt-2 pb-2 px-4 border-t border-white/5 mx-2 my-1">
+                {customerUser ? (
+                  <div className="space-y-3 text-left">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-purple-500/15 border border-purple-500/20 flex items-center justify-center text-purple-400">
+                        {customerUser.photoURL ? (
+                          <img src={customerUser.photoURL} alt="Avatar" className="w-full h-full rounded-full" referrerPolicy="no-referrer" />
+                        ) : (
+                          <User className="w-4 h-4" />
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold text-white truncate">{customerUser.displayName || "Buyer Account"}</p>
+                        <p className="text-[10px] text-slate-400 font-mono truncate">{customerUser.email}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={async () => {
+                        await logoutCustomer();
+                        setIsOpen(false);
+                      }}
+                      className="w-full py-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/15 text-xs font-semibold rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-colors"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Disconnect Sync Profile</span>
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setIsAuthModalOpen(true);
+                      setIsOpen(false);
+                    }}
+                    className="w-full py-2.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-300 border border-blue-500/15 text-xs font-semibold rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all"
+                  >
+                    <User className="w-3.5 h-3.5 text-blue-400" />
+                    <span>User Account Sign In / Sign Up</span>
+                  </button>
+                )}
+              </div>
+
+              <div className="pt-2 px-4">
                 <button
                   id="mobile-header-cta-whatsapp"
                   onClick={() => {
@@ -239,6 +361,9 @@ export default function Header() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Customer authentication Modal */}
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </header>
   );
 }

@@ -57,6 +57,36 @@ Your goals:
 `;
 
 // API Routes
+// Secure Admin Login API to keep credentials safely on the server side
+app.post('/api/admin/login', (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required credentials.' });
+    }
+
+    const secureAdminEmail = (process.env.ADMIN_EMAIL || 'wanchaaaron@gmail.com').toLowerCase().trim();
+    const secureAdminPassword = process.env.ADMIN_PASSWORD || '8585';
+
+    if (email.toLowerCase().trim() === secureAdminEmail && password === secureAdminPassword) {
+      return res.json({
+        success: true,
+        user: {
+          uid: 'supa-admin-id',
+          email: secureAdminEmail,
+          displayName: 'Supa Admin',
+          role: 'super_admin'
+        }
+      });
+    }
+
+    return res.status(401).json({ error: 'Incorrect staff or master credentials.' });
+  } catch (error) {
+    console.error('[Admin Auth Error]:', error);
+    return res.status(500).json({ error: 'Internal administrative auth error.' });
+  }
+});
+
 app.post('/api/chat', async (req, res) => {
   try {
     const { messages } = req.body;

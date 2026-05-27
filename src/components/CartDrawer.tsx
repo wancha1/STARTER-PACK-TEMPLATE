@@ -521,7 +521,7 @@ Hello ${BUSINESS_INFO.name}! 👋 I placed an order via your online store. Pleas
                     <input
                       type="tel"
                       required
-                      placeholder="e.g. +256 708 428 805"
+                      placeholder="e.g. +256 772 604 777"
                       value={customerPhone}
                       onChange={(e) => setCustomerPhone(e.target.value)}
                       className="w-full bg-black/40 border border-white/10 focus:border-blue-400 text-xs rounded-xl p-3 text-white outline-none"

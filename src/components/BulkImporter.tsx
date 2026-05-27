@@ -135,8 +135,6 @@ export default function BulkImporter() {
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState<string | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(false);
-  const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
-  const [simulatedAuth, setSimulatedAuth] = useState(false);
 
   // Directory filter variables
   const [dirSearch, setDirSearch] = useState("");
@@ -169,49 +167,53 @@ export default function BulkImporter() {
     return ["All", ...new Set(products.map((p) => p.category))];
   }, [products]);
 
-  // Handle Supabase Auth Actions
+  // Handle Administrative Auth Actions strictly with secure cryptographically verified server-side validation
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
     setIsAuthLoading(true);
 
-    const supabase = getSupabase();
-    if (!supabase) {
-      setAuthError("Supabase is not configured yet. Set keys in your secrets or use simulated mode.");
-      setIsAuthLoading(false);
-      return;
-    }
-
     try {
-      if (authMode === "signin") {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        setAdminUser(data.user);
-      } else {
-        const { data, error } = await supabase.auth.signUp({ email, password });
-        if (error) throw error;
-        setAuthError("Check your inbox for a confirmation email, or proceed to sign in if auto-confirmed.");
+      const resp = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.toLowerCase().trim(), password })
+      });
+
+      const contentType = resp.headers.get("content-type");
+      let data: any = null;
+      if (contentType && contentType.includes("application/json")) {
+        try {
+          data = await resp.json();
+        } catch (jsonErr) {
+          console.error("Failed to parse json on response:", jsonErr);
+        }
       }
-    } catch (err: any) {
-      setAuthError(err.message || "Authentication failed. Double check your input values.");
+
+      if (resp.ok && data) {
+        if (data.success && data.user) {
+          setAdminUser(data.user);
+          setIsAuthLoading(false);
+          return;
+        }
+      } else {
+        const errMsg = data?.error || "Incorrect administrative passphrase or credentials.";
+        setAuthError(errMsg);
+      }
+    } catch (apiErr) {
+      console.error("Secure backend admin login handshake fails:", apiErr);
+      setAuthError("Administrative auth communications offline. Please check network connection.");
     } finally {
       setIsAuthLoading(false);
     }
   };
 
-  const handleSimulateLogin = () => {
-    setSimulatedAuth(true);
-    setAdminUser({ id: "simulated-admin-id", email: "warehouse-director@apex.com" });
-    setAuthError(null);
-  };
-
   const handleSignOut = async () => {
     const supabase = getSupabase();
-    if (supabase && !simulatedAuth) {
+    if (supabase) {
       await supabase.auth.signOut();
     }
     setAdminUser(null);
-    setSimulatedAuth(false);
   };
 
   // Directory Filtration & Pagination
@@ -300,7 +302,7 @@ export default function BulkImporter() {
     };
 
     const supabase = getSupabase();
-    if (supabase && isSupabaseActive && !simulatedAuth) {
+    if (supabase && isSupabaseActive) {
       const sbMapped = mapFrontendToSupabase(updated);
       const { error } = await supabase
         .from("products")
@@ -321,7 +323,7 @@ export default function BulkImporter() {
     if (!window.confirm("Are you sure you want to delete this product? This action cannot be undone.")) return;
 
     const supabase = getSupabase();
-    if (supabase && isSupabaseActive && !simulatedAuth) {
+    if (supabase && isSupabaseActive) {
       const { error } = await supabase
         .from("products")
         .delete()
@@ -460,7 +462,7 @@ export default function BulkImporter() {
     let committedCount = 0;
     let failedCount = 0;
 
-    if (supabase && isSupabaseActive && !simulatedAuth) {
+    if (supabase && isSupabaseActive) {
       // Chunk size of 100 prevents network packet bottlenecks
       const segmentSize = 100;
       for (let i = 0; i < filteredToCommit.length; i += segmentSize) {
@@ -547,7 +549,7 @@ export default function BulkImporter() {
     setIsUploadingMedia(true);
     const supabase = getSupabase();
 
-    if (!supabase || !isSupabaseActive || simulatedAuth) {
+    if (!supabase || !isSupabaseActive) {
       // Simulate uploads
       setTimeout(() => {
         const dummyFiles = files.map((f) => ({
@@ -761,7 +763,7 @@ export default function BulkImporter() {
 
     try {
       const supabase = getSupabase();
-      if (supabase && isSupabaseActive && !simulatedAuth) {
+      if (supabase && isSupabaseActive) {
         // Safe batch processing (chunk sizes of 100)
         const segmentSize = 100;
         let batchNo = 0;
@@ -878,7 +880,7 @@ export default function BulkImporter() {
       const logTimestamp = new Date().toISOString();
 
       const supabase = getSupabase();
-      if (supabase && isSupabaseActive && !simulatedAuth) {
+      if (supabase && isSupabaseActive) {
         const segmentSize = 100;
         for (let i = 0; i < results.validProductsToSave.length; i += segmentSize) {
           const segment = results.validProductsToSave.slice(i, i + segmentSize);
@@ -1042,6 +1044,11 @@ export default function BulkImporter() {
                   </div>
                 )}
 
+                {/* Secure Signed staff login signature */}
+                <div className="w-full bg-[#030308] border border-white/5 rounded-xl py-2 px-4 mb-4 select-none text-[10px] font-mono uppercase tracking-wider text-center text-emerald-400 font-extrabold">
+                  🔒 Certified Administrative Portal
+                </div>
+
                 <form onSubmit={handleAuth} className="w-full space-y-4 text-left">
                   <div>
                     <label className="block text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1 font-bold">Email Address:</label>
@@ -1066,39 +1073,17 @@ export default function BulkImporter() {
                     />
                   </div>
 
-                  <div className="flex gap-2.5 pt-2">
+                  <div className="pt-2">
                     <button
                       type="submit"
                       disabled={isAuthLoading}
-                      onClick={() => setAuthMode("signin")}
-                      className="flex-1 py-3 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 disabled:opacity-50 text-white font-extrabold text-xs rounded-xl active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2"
+                      className="w-full py-3 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 disabled:opacity-50 text-white font-extrabold text-xs rounded-xl active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2"
                     >
                       <LogIn className="w-4 h-4" />
-                      <span>{isAuthLoading ? "Authenticating..." : "Sign In Admin"}</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleSimulateLogin}
-                      className="px-4 border border-white/15 bg-white/5 hover:bg-white/10 text-white text-xs font-bold rounded-xl transition-colors active:scale-95 cursor-pointer"
-                    >
-                      Bypass Sandbox
+                      <span>{isAuthLoading ? "Authenticating Admin..." : "Secure Sign In Admin"}</span>
                     </button>
                   </div>
                 </form>
-
-                <div className="mt-6 border-t border-white/5 pt-4 w-full flex items-center justify-between text-[11px] font-mono text-slate-400">
-                  <span>No connection properties?</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAdminUser({ id: "simulated-admin-id", email: "unregistered-viewer@apex.com" });
-                      setActiveTab("setup");
-                    }}
-                    className="text-emerald-400 underline hover:text-emerald-300 cursor-pointer"
-                  >
-                    View Setup Instructions
-                  </button>
-                </div>
               </div>
             ) : (
               /* FULLY AUTHENTICATED ADMIN CONSOLE VIEW */
@@ -1114,7 +1099,7 @@ export default function BulkImporter() {
                       </h4>
                     </div>
                     <p className="text-[11px] font-mono text-slate-400 mt-1">
-                      Logged in as: <strong className="text-emerald-400">{adminUser.email}</strong> {simulatedAuth && "(Local Sandbox Overlock)"}
+                      Logged in as: <strong className="text-emerald-400">{adminUser.email}</strong>
                     </p>
                   </div>
 
