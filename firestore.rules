@@ -1,0 +1,57 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Global Catch-All Security Wall
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 2. Global Helper Functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // 3. Orders Collection Rule Definitions
+    match /orders/{orderId} {
+      // Validate order fields in rules
+      function isValidOrder(data) {
+        return data.userId is string 
+          && data.userId.size() <= 128
+          && data.customerName is string
+          && data.customerName.size() <= 100
+          && data.customerPhone is string
+          && data.customerPhone.size() <= 45
+          && data.orderId is string
+          && data.orderId.size() <= 32
+          && data.totalAmount is number
+          && data.items is list
+          && data.items.size() > 0;
+      }
+
+      // Read rules: Users can list and get their own orders
+      allow get, list: if isSignedIn() && resource.data.userId == request.auth.uid;
+
+      // Create rules: Users can place orders under their authentic UID or as a guest. 
+      // If signed in, their userId field must match their authenticated auth.uid exactly.
+      allow create: if isValidOrder(incoming()) && (
+        (isSignedIn() && incoming().userId == request.auth.uid) || 
+        (!isSignedIn() && incoming().userId == "guest")
+      );
+
+      // Disable any modifications or deletes from clients for integrity
+      allow update, delete: if false;
+    }
+  }
+}

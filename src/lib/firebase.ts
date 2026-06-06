@@ -12,6 +12,8 @@ import {
   signInWithEmailAndPassword,
   updateProfile
 } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import firebaseAppletConfig from "../../firebase-applet-config.json";
 
 const cleanEnvVar = (val: any): string | undefined => {
   if (typeof val !== "string") return undefined;
@@ -29,12 +31,12 @@ const getEnvVal = (key: string, fallback: string): string => {
 };
 
 const firebaseConfig = {
-  apiKey: getEnvVal("VITE_FIREBASE_API_KEY", "AIzaSyBD8pHCfAFB9v5CVld1xJ68PsF02Bk83g4"),
-  authDomain: getEnvVal("VITE_FIREBASE_AUTH_DOMAIN", "electric-tesla-497514-r1.firebaseapp.com"),
-  projectId: getEnvVal("VITE_FIREBASE_PROJECT_ID", "electric-tesla-497514-r1"),
-  storageBucket: getEnvVal("VITE_FIREBASE_STORAGE_BUCKET", "electric-tesla-497514-r1.firebasestorage.app"),
-  messagingSenderId: getEnvVal("VITE_FIREBASE_MESSAGING_SENDER_ID", "612717024838"),
-  appId: getEnvVal("VITE_FIREBASE_APP_ID", "1:612717024838:web:7455548b2871888d269c47")
+  apiKey: firebaseAppletConfig.apiKey || getEnvVal("VITE_FIREBASE_API_KEY", "AIzaSyBD8pHCfAFB9v5CVld1xJ68PsF02Bk83g4"),
+  authDomain: firebaseAppletConfig.authDomain || getEnvVal("VITE_FIREBASE_AUTH_DOMAIN", "electric-tesla-497514-r1.firebaseapp.com"),
+  projectId: firebaseAppletConfig.projectId || getEnvVal("VITE_FIREBASE_PROJECT_ID", "electric-tesla-497514-r1"),
+  storageBucket: firebaseAppletConfig.storageBucket || getEnvVal("VITE_FIREBASE_STORAGE_BUCKET", "electric-tesla-497514-r1.firebasestorage.app"),
+  messagingSenderId: firebaseAppletConfig.messagingSenderId || getEnvVal("VITE_FIREBASE_MESSAGING_SENDER_ID", "612717024838"),
+  appId: firebaseAppletConfig.appId || getEnvVal("VITE_FIREBASE_APP_ID", "1:612717024838:web:7455548b2871888d269c47")
 };
 
 const app = initializeApp(firebaseConfig);
@@ -60,6 +62,7 @@ try {
 
 export const auth = authInstance;
 export const googleProvider = new GoogleAuthProvider();
+export const db = getFirestore(app, firebaseAppletConfig.firestoreDatabaseId);
 
 export { 
   signInWithPopup, 

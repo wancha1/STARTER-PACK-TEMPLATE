@@ -290,6 +290,20 @@ export function parseAndValidateSheetData(
       stockStatus = "Low Stock";
     }
 
+    const rawQuantity = record.stockquantity || record.stock_quantity || record.quantity || record.units || record.stock || record.inventory;
+    let stockQuantity: number | undefined = undefined;
+    if (rawQuantity !== undefined && rawQuantity !== null && rawQuantity !== "") {
+      const parsedQty = parseInt(rawQuantity, 10);
+      if (!isNaN(parsedQty)) {
+        stockQuantity = parsedQty;
+      }
+    }
+    if (stockQuantity === undefined) {
+      if (stockStatus === "Out of Stock") stockQuantity = 0;
+      else if (stockStatus === "Low Stock") stockQuantity = 3;
+      else if (stockStatus === "In Stock") stockQuantity = 12;
+    }
+
     // 9. Auto-calculation of Dynamic Discount Badges
     let badge = (record.badge || "").trim() || undefined;
     if (originalPriceVal && originalPriceVal > priceVal) {
@@ -317,6 +331,7 @@ export function parseAndValidateSheetData(
       colors,
       storages,
       stockStatus,
+      stockQuantity,
       images: images.length > 0 ? images : ["https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=600&auto=format&fit=crop&q=60"], // default fallback high contrast Unsplash mockup
       videos,
       description: record.description || "Certified Ugandan imports. Authorized dealer-sealed with instantaneous guarantees.",

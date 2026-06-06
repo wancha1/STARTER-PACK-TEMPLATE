@@ -25,6 +25,7 @@ import {
   Shield,
   LogIn,
   LogOut,
+  KeyRound,
   Search,
   Trash2,
   Edit,
@@ -48,6 +49,22 @@ import {
   Star,
   TrendingDown
 } from "lucide-react";
+
+// Safe JSON parser helper to prevent HTML-fallback response parsing crash
+async function parseSafeJson(response: Response) {
+  const contentType = response.headers.get("content-type");
+  if (contentType && contentType.toLowerCase().includes("application/json")) {
+    try {
+      return await response.json();
+    } catch (e) {
+      console.error("Malformed JSON response structure parsed:", e);
+      return { error: "Corrupted JSON content." };
+    }
+  }
+  const bodyText = await response.text();
+  console.warn("Interacted with non-JSON response payload. Body slice: ", bodyText.slice(0, 300));
+  return { error: `Server returned non-JSON representation (HTTP Status: ${response.status})` };
+}
 
 export default function BulkImporter() {
   const {
@@ -146,7 +163,7 @@ export default function BulkImporter() {
         credentials: "include"
       });
       if (res.ok) {
-        const data = await res.json();
+        const data = await parseSafeJson(res);
         setPriceDropSubscriptions(data.subscriptions || []);
       }
     } catch (err) {
@@ -164,7 +181,7 @@ export default function BulkImporter() {
         credentials: "include"
       });
       if (res.ok) {
-        const data = await res.json();
+        const data = await parseSafeJson(res);
         setShowroomReviews(data.reviews || []);
       }
     } catch (err) {
@@ -186,7 +203,7 @@ export default function BulkImporter() {
         body: JSON.stringify({ subscriptionId }),
         credentials: "include"
       });
-      const data = await res.json();
+      const data = await parseSafeJson(res);
       if (!res.ok) throw new Error(data.error || "Failed to release price drop alert.");
       alert(`Success! Simulated email notice dispatched to subscriber!`);
       await fetchPriceDropSubscriptions();
@@ -203,7 +220,7 @@ export default function BulkImporter() {
         headers: { "X-CSRF-Token": csrfToken || "" },
         credentials: "include"
       });
-      const data = await res.json();
+      const data = await parseSafeJson(res);
       if (!res.ok) throw new Error(data.error || "Failed to delete review.");
       alert(`Success! Review removed successfully.`);
       await fetchShowroomReviews();
@@ -222,7 +239,7 @@ export default function BulkImporter() {
         credentials: "include"
       });
       if (res.ok) {
-        const data = await res.json();
+        const data = await parseSafeJson(res);
         if (data.subscriptions) {
           setRestockSubscriptions(data.subscriptions);
         } else {
@@ -290,6 +307,151 @@ export default function BulkImporter() {
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState<string | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(false);
+
+  // Recovery Desk states
+  const [isRecoveryMode, setIsRecoveryMode] = useState(false);
+  const [recoverySubMode, setRecoverySubMode] = useState<"token" | "questions" | "master-key">("token");
+  const [recoveryEmail, setRecoveryEmail] = useState("");
+  const [recoveryTokenInput, setRecoveryTokenInput] = useState("");
+  const [recoveryNewPassword, setRecoveryNewPassword] = useState("");
+  const [recoveryAnswer1, setRecoveryAnswer1] = useState("");
+  const [recoveryAnswer2, setRecoveryAnswer2] = useState("");
+  const [recoveryError, setRecoveryError] = useState<string | null>(null);
+  const [recoverySuccess, setRecoverySuccess] = useState<string | null>(null);
+  const [isRecoveryLoading, setIsRecoveryLoading] = useState(false);
+
+  // Trigger Recovery Token request
+  const handleRecoveryRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setRecoveryError(null);
+    setRecoverySuccess(null);
+    setIsRecoveryLoading(true);
+    try {
+      const res = await fetch("/api/admin/recovery/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: recoveryEmail.toLowerCase().trim() })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setRecoverySuccess(data.message || "Recovery code generated and printed to server logs!");
+      } else {
+        setRecoveryError(data.error || "Failed to initiate recovery request.");
+      }
+    } catch (err) {
+      setRecoveryError("API communication error occurred.");
+    } finally {
+      setIsRecoveryLoading(false);
+    }
+  };
+
+  // Verify token & Reset password
+  const handleRecoveryVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setRecoveryError(null);
+    setRecoverySuccess(null);
+    setIsRecoveryLoading(true);
+    try {
+      const res = await fetch("/api/admin/recovery/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: recoveryEmail.toLowerCase().trim(),
+          token: recoveryTokenInput.trim(),
+          newPassword: recoveryNewPassword
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setRecoverySuccess(data.message || "Password updated successfully. You can now sign in!");
+        setRecoveryTokenInput("");
+        setRecoveryNewPassword("");
+        setPassword("");
+        setTimeout(() => {
+          setIsRecoveryMode(false);
+          setRecoverySuccess(null);
+        }, 3000);
+      } else {
+        setRecoveryError(data.error || "Invalid token or reset parameters.");
+      }
+    } catch (err) {
+      setRecoveryError("API communication error occurred.");
+    } finally {
+      setIsRecoveryLoading(false);
+    }
+  };
+
+  // Reset via Master Recovery Key
+  const handleRecoveryBypass = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setRecoveryError(null);
+    setRecoverySuccess(null);
+    setIsRecoveryLoading(true);
+    try {
+      const res = await fetch("/api/admin/recovery/bypass", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          recoveryKey: recoveryTokenInput.trim(),
+          newPassword: recoveryNewPassword
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setRecoverySuccess(data.message || "Credentials updated successfully via Master Security Key!");
+        setRecoveryTokenInput("");
+        setRecoveryNewPassword("");
+        setPassword("");
+        setTimeout(() => {
+          setIsRecoveryMode(false);
+          setRecoverySuccess(null);
+        }, 3000);
+      } else {
+        setRecoveryError(data.error || "Failed to override credentials using master key.");
+      }
+    } catch (err) {
+      setRecoveryError("API communication error.");
+    } finally {
+      setIsRecoveryLoading(false);
+    }
+  };
+
+  // Reset via Security Questions answers
+  const handleRecoveryQuestions = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setRecoveryError(null);
+    setRecoverySuccess(null);
+    setIsRecoveryLoading(true);
+    try {
+      const res = await fetch("/api/admin/recovery/questions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          answer1: recoveryAnswer1,
+          answer2: recoveryAnswer2,
+          newPassword: recoveryNewPassword
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setRecoverySuccess(data.message || "Credentials recovered via security questions!");
+        setRecoveryAnswer1("");
+        setRecoveryAnswer2("");
+        setRecoveryNewPassword("");
+        setPassword("");
+        setTimeout(() => {
+          setIsRecoveryMode(false);
+          setRecoverySuccess(null);
+        }, 3000);
+      } else {
+        setRecoveryError(data.error || "Incorrect security credentials answers supplied.");
+      }
+    } catch (err) {
+      setRecoveryError("API communication error.");
+    } finally {
+      setIsRecoveryLoading(false);
+    }
+  };
 
   // Directory filter variables
   const [dirSearch, setDirSearch] = useState("");
@@ -1327,64 +1489,277 @@ export default function BulkImporter() {
           <div className="mt-6 text-left animate-in fade-in duration-300">
             {/* RENDER LOGIN SCREEN IF NOT AUTHENTICATED */}
             {!adminUser ? (
-              <div className="bg-[#05050c] border border-white/15 rounded-3xl p-6 shadow-2xl relative overflow-hidden flex flex-col items-center max-w-lg mx-auto text-center">
-                <div className="absolute top-0 inset-x-0 h-[100px] bg-emerald-500/5 blur-3xl pointer-events-none" />
-                <div className="p-4 rounded-full bg-emerald-500/10 text-emerald-400 mb-4">
-                  <Shield className="w-8 h-8" />
+              isRecoveryMode ? (
+                <div className="bg-[#05050c] border border-white/15 rounded-3xl p-6 shadow-2xl relative overflow-hidden flex flex-col items-center max-w-lg mx-auto text-center w-full animate-in fade-in duration-300">
+                  <div className="absolute top-0 inset-x-0 h-[100px] bg-sky-500/5 blur-3xl pointer-events-none" />
+                  <div className="p-4 rounded-full bg-sky-500/10 text-sky-400 mb-4 animate-bounce">
+                    <KeyRound className="w-8 h-8" />
+                  </div>
+                  <h4 className="text-lg font-display font-extrabold text-white">Administrative Recovery Desk</h4>
+                  <p className="text-xs text-slate-400 font-light mt-1 max-w-sm mb-4">
+                    Recover your staff username/email or securely override your passphrase.
+                  </p>
+
+                  {recoverySuccess && (
+                    <div className="mb-4 w-full p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 shrink-0 animate-pulse" />
+                      <span className="text-left font-light leading-snug text-emerald-400">{recoverySuccess}</span>
+                    </div>
+                  )}
+
+                  {recoveryError && (
+                    <div className="mb-4 w-full p-3 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 shrink-0" />
+                      <span className="text-left font-light leading-snug">{recoveryError}</span>
+                    </div>
+                  )}
+
+                  {/* RECOVERY TABS */}
+                  <div className="flex w-full bg-black/40 p-1 rounded-xl gap-1 mb-4 border border-white/5">
+                    {(["token", "questions", "master-key"] as const).map((mode) => (
+                      <button
+                        key={mode}
+                        type="button"
+                        onClick={() => {
+                          setRecoverySubMode(mode);
+                          setRecoveryError(null);
+                          setRecoverySuccess(null);
+                        }}
+                        className={`flex-1 py-1.5 text-[10px] font-mono uppercase tracking-wider rounded-lg transition-colors cursor-pointer ${
+                          recoverySubMode === mode
+                            ? "bg-sky-500 text-white font-extrabold"
+                            : "text-slate-400 hover:text-white"
+                        }`}
+                      >
+                        {mode === "token" ? "Email Code" : mode === "questions" ? "Security Qs" : "Master Passkey"}
+                      </button>
+                    ))}
+                  </div>
+
+                  {recoverySubMode === "token" && (
+                    <div className="w-full space-y-4">
+                      <form onSubmit={handleRecoveryRequest} className="w-full space-y-3 text-left">
+                        <div>
+                          <label className="block text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1 font-bold">Step 1: Admin Email Address:</label>
+                          <div className="flex gap-2">
+                            <input
+                              type="email"
+                              value={recoveryEmail}
+                              onChange={(e) => setRecoveryEmail(e.target.value)}
+                              required
+                              placeholder="e.g. administrator@apex.co.ug"
+                              className="flex-1 bg-[#0a0a14] border border-white/10 text-xs text-white rounded-xl py-3 px-4 focus:border-sky-500 outline-none transition-colors"
+                            />
+                            <button
+                              type="submit"
+                              disabled={isRecoveryLoading}
+                              className="px-4 bg-sky-600 hover:bg-sky-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl active:scale-95 transition-all cursor-pointer whitespace-nowrap"
+                            >
+                              Request Code
+                            </button>
+                          </div>
+                          <span className="text-[10px] text-slate-500 mt-1 block">Authentic codes are printed in server diagnostic logs.</span>
+                        </div>
+                      </form>
+
+                      <form onSubmit={handleRecoveryVerify} className="w-full space-y-4 text-left pt-2 border-t border-white/5">
+                        <div>
+                          <label className="block text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1 font-bold">Step 2: 6-Digit Code Check:</label>
+                          <input
+                            type="text"
+                            value={recoveryTokenInput}
+                            onChange={(e) => setRecoveryTokenInput(e.target.value)}
+                            required
+                            placeholder="e.g. 123456"
+                            className="w-full bg-[#0a0a14] border border-white/10 text-xs text-white rounded-xl py-3 px-4 focus:border-sky-500 outline-none transition-colors"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1 font-bold">Step 3: New Secret Passphrase:</label>
+                          <input
+                            type="password"
+                            value={recoveryNewPassword}
+                            onChange={(e) => setRecoveryNewPassword(e.target.value)}
+                            required
+                            placeholder="••••••••••••"
+                            className="w-full bg-[#0a0a14] border border-white/10 text-xs text-white rounded-xl py-3 px-4 focus:border-sky-500 outline-none transition-colors"
+                          />
+                        </div>
+                        <button
+                          type="submit"
+                          disabled={isRecoveryLoading || !recoveryTokenInput || !recoveryNewPassword}
+                          className="w-full py-3 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 disabled:opacity-50 text-white font-extrabold text-xs rounded-xl active:scale-95 transition-all cursor-pointer"
+                        >
+                          Reset Admin Password
+                        </button>
+                      </form>
+                    </div>
+                  )}
+
+                  {recoverySubMode === "questions" && (
+                    <form onSubmit={handleRecoveryQuestions} className="w-full space-y-4 text-left">
+                      <div>
+                        <label className="block text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1 font-semibold">Q1: What road is the Lira showroom located on?</label>
+                        <input
+                          type="text"
+                          value={recoveryAnswer1}
+                          onChange={(e) => setRecoveryAnswer1(e.target.value)}
+                          required
+                          placeholder="e.g. Obote Avenue"
+                          className="w-full bg-[#0a0a14] border border-white/10 text-xs text-white rounded-xl py-3 px-4 focus:border-sky-500 outline-none transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1 font-semibold">Q2: Name the electronics brand of this luxury showroom:</label>
+                        <input
+                          type="text"
+                          value={recoveryAnswer2}
+                          onChange={(e) => setRecoveryAnswer2(e.target.value)}
+                          required
+                          placeholder="e.g. Apex"
+                          className="w-full bg-[#0a0a14] border border-white/10 text-xs text-white rounded-xl py-3 px-4 focus:border-sky-500 outline-none transition-colors"
+                        />
+                      </div>
+                      <div className="pt-2 border-t border-white/5">
+                        <label className="block text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1 font-bold">New Secret Passphrase:</label>
+                        <input
+                          type="password"
+                          value={recoveryNewPassword}
+                          onChange={(e) => setRecoveryNewPassword(e.target.value)}
+                          required
+                          placeholder="••••••••••••"
+                          className="w-full bg-[#0a0a14] border border-white/10 text-xs text-white rounded-xl py-3 px-4 focus:border-sky-500 outline-none transition-colors"
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        disabled={isRecoveryLoading}
+                        className="w-full py-3 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 disabled:opacity-50 text-white font-extrabold text-xs rounded-xl active:scale-95 transition-all cursor-pointer"
+                      >
+                        Verify Answers & Reset
+                      </button>
+                    </form>
+                  )}
+
+                  {recoverySubMode === "master-key" && (
+                    <form onSubmit={handleRecoveryBypass} className="w-full space-y-4 text-left">
+                      <div>
+                        <label className="block text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1 font-bold">Master Security Recovery Key:</label>
+                        <input
+                          type="password"
+                          value={recoveryTokenInput}
+                          onChange={(e) => setRecoveryTokenInput(e.target.value)}
+                          required
+                          placeholder="Enter master bypass token key..."
+                          className="w-full bg-[#0a0a14] border border-white/10 text-xs text-white rounded-xl py-3 px-4 focus:border-sky-500 outline-none transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1 font-bold">New Secret Passphrase:</label>
+                        <input
+                          type="password"
+                          value={recoveryNewPassword}
+                          onChange={(e) => setRecoveryNewPassword(e.target.value)}
+                          required
+                          placeholder="••••••••••••"
+                          className="w-full bg-[#0a0a14] border border-white/10 text-xs text-white rounded-xl py-3 px-4 focus:border-sky-500 outline-none transition-colors"
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        disabled={isRecoveryLoading}
+                        className="w-full py-3 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 disabled:opacity-50 text-white font-extrabold text-xs rounded-xl active:scale-95 transition-all cursor-pointer"
+                      >
+                        Recover with Master Key
+                      </button>
+                    </form>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsRecoveryMode(false);
+                      setRecoveryError(null);
+                      setRecoverySuccess(null);
+                    }}
+                    className="mt-6 text-xs text-sky-400 hover:text-sky-300 font-extrabold hover:underline cursor-pointer"
+                  >
+                    ← Return to Secure Admin Login
+                  </button>
                 </div>
-                <h4 className="text-lg font-display font-extrabold text-white">Administrative Portal Access</h4>
-                <p className="text-xs text-slate-400 font-light mt-1 max-w-sm mb-6">
-                  Log in with authorized warehouse credentials to manage inventory entries, upload firmware media, or sync bulk catalogs.
-                </p>
-
-                {authError && (
-                  <div className="mb-4 w-full p-3 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 shrink-0" />
-                    <span className="text-left font-light leading-snug">{authError}</span>
+              ) : (
+                <div className="bg-[#05050c] border border-white/15 rounded-3xl p-6 shadow-2xl relative overflow-hidden flex flex-col items-center max-w-lg mx-auto text-center w-full">
+                  <div className="absolute top-0 inset-x-0 h-[100px] bg-emerald-500/5 blur-3xl pointer-events-none" />
+                  <div className="p-4 rounded-full bg-emerald-500/10 text-emerald-400 mb-4">
+                    <Shield className="w-8 h-8" />
                   </div>
-                )}
+                  <h4 className="text-lg font-display font-extrabold text-white">Administrative Portal Access</h4>
+                  <p className="text-xs text-slate-400 font-light mt-1 max-w-sm mb-6">
+                    Log in with authorized warehouse credentials to manage inventory entries, upload firmware media, or sync bulk catalogs.
+                  </p>
 
-                {/* Secure Signed staff login signature */}
-                <div className="w-full bg-[#030308] border border-white/5 rounded-xl py-2 px-4 mb-4 select-none text-[10px] font-mono uppercase tracking-wider text-center text-emerald-400 font-extrabold">
-                  🔒 Certified Administrative Portal
+                  {authError && (
+                    <div className="mb-4 w-full p-3 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 shrink-0" />
+                      <span className="text-left font-light leading-snug">{authError}</span>
+                    </div>
+                  )}
+
+                  {/* Secure Signed staff login signature */}
+                  <div className="w-full bg-[#030308] border border-white/5 rounded-xl py-2 px-4 mb-4 select-none text-[10px] font-mono uppercase tracking-wider text-center text-emerald-400 font-extrabold">
+                    🔒 Certified Administrative Portal
+                  </div>
+
+                  <form onSubmit={handleAuth} className="w-full space-y-4 text-left">
+                    <div>
+                      <label className="block text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1 font-bold">Email Address:</label>
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        placeholder="e.g. administrator@apex.co.ug"
+                        className="w-full bg-[#0a0a14] border border-white/10 text-xs text-white rounded-xl py-3 px-4 focus:border-emerald-500 outline-none transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1 font-bold">Secret Passphrase:</label>
+                      <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        placeholder="••••••••••••"
+                        className="w-full bg-[#0a0a14] border border-white/10 text-xs text-white rounded-xl py-3 px-4 focus:border-emerald-500 outline-none transition-colors"
+                      />
+                    </div>
+
+                    <div className="pt-2">
+                      <button
+                        type="submit"
+                        disabled={isAuthLoading}
+                        className="w-full py-3 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 disabled:opacity-50 text-white font-extrabold text-xs rounded-xl active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2"
+                      >
+                        <LogIn className="w-4 h-4" />
+                        <span>{isAuthLoading ? "Authenticating Admin..." : "Secure Sign In Admin"}</span>
+                      </button>
+                    </div>
+                  </form>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsRecoveryMode(true);
+                      setRecoveryError(null);
+                      setRecoverySuccess(null);
+                    }}
+                    className="mt-5 text-xs text-slate-400 hover:text-white font-medium underline flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <KeyRound className="w-3.5 h-3.5 text-sky-400" />
+                    <span>Forgot Passphrase or Recover Account?</span>
+                  </button>
                 </div>
-
-                <form onSubmit={handleAuth} className="w-full space-y-4 text-left">
-                  <div>
-                    <label className="block text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1 font-bold">Email Address:</label>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      placeholder="e.g. administrator@apex.co.ug"
-                      className="w-full bg-[#0a0a14] border border-white/10 text-xs text-white rounded-xl py-3 px-4 focus:border-emerald-500 outline-none transition-colors"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-mono uppercase tracking-wider text-slate-400 mb-1 font-bold">Secret Passphrase:</label>
-                    <input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      placeholder="••••••••••••"
-                      className="w-full bg-[#0a0a14] border border-white/10 text-xs text-white rounded-xl py-3 px-4 focus:border-emerald-500 outline-none transition-colors"
-                    />
-                  </div>
-
-                  <div className="pt-2">
-                    <button
-                      type="submit"
-                      disabled={isAuthLoading}
-                      className="w-full py-3 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 disabled:opacity-50 text-white font-extrabold text-xs rounded-xl active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2"
-                    >
-                      <LogIn className="w-4 h-4" />
-                      <span>{isAuthLoading ? "Authenticating Admin..." : "Secure Sign In Admin"}</span>
-                    </button>
-                  </div>
-                </form>
-              </div>
+              )
             ) : (
               /* FULLY AUTHENTICATED ADMIN CONSOLE VIEW */
               <div className="bg-[#05050b] border border-white/10 rounded-3xl p-6 shadow-2xl relative">

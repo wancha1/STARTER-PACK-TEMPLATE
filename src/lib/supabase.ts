@@ -73,7 +73,8 @@ export function mapSupabaseToFrontend(p: SupabaseProduct): Product {
     reviewsCount: parseInt(ds.reviewsCount ?? "15") || 15,
     iconName: ds.iconName || "Smartphone",
     videoPreview: ds.videoPreview || undefined,
-    detailedSpecs: ds.techSpecs || []
+    detailedSpecs: ds.techSpecs || [],
+    stockQuantity: ds.stockQuantity !== undefined ? Number(ds.stockQuantity) : undefined
   };
 }
 
@@ -100,7 +101,8 @@ export function mapFrontendToSupabase(p: Product): Partial<SupabaseProduct> {
       reviewsCount: p.reviewsCount,
       iconName: p.iconName,
       videoPreview: p.videoPreview,
-      techSpecs: p.detailedSpecs || []
+      techSpecs: p.detailedSpecs || [],
+      stockQuantity: p.stockQuantity
     }
   };
 }

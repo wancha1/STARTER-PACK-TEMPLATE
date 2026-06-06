@@ -81,6 +81,7 @@ export const PRODUCTS: Product[] = [
     colors: ["Natural Titanium", "Blue Titanium", "Black Titanium"],
     storages: ["256GB", "512GB"],
     stockStatus: "In Stock",
+    stockQuantity: 14,
     specs: ["A17 Pro Chip", "6.7\" Super Retina XDR", "5x Optical Zoom Camera", "USB-C High Speed"],
     iconName: "Smartphone"
   },
@@ -97,6 +98,7 @@ export const PRODUCTS: Product[] = [
     colors: ["Titanium Gray", "Titanium Black", "Titanium Violet"],
     storages: ["256GB", "512GB"],
     stockStatus: "In Stock",
+    stockQuantity: 8,
     specs: ["Snapdragon 8 Gen 3", "6.8\" Dynamic AMOLED 2X", "S-Pen Stylus Included", "Galaxy AI Engine"],
     iconName: "Smartphone"
   },
@@ -113,6 +115,7 @@ export const PRODUCTS: Product[] = [
     colors: ["Space Gray", "Silver"],
     storages: ["512GB SSD", "1TB SSD"],
     stockStatus: "In Stock",
+    stockQuantity: 6,
     specs: ["Apple M3 8-Core CPU", "16GB Unified Memory", "14.2\" Liquid Retina XDR", "Up to 22h Battery Life"],
     iconName: "Laptop"
   },
@@ -129,6 +132,7 @@ export const PRODUCTS: Product[] = [
     colors: ["Astor Silver"],
     storages: ["512GB SSD"],
     stockStatus: "Out of Stock",
+    stockQuantity: 0,
     specs: ["Intel Core i7 13th Gen", "16GB DDR5 RAM", "14.0\" FHD Anti-Glare", "Windows 11 Pro Licensed"],
     iconName: "Laptop"
   },
@@ -145,6 +149,7 @@ export const PRODUCTS: Product[] = [
     colors: ["Classic White"],
     storages: ["1TB SSD Storage"],
     stockStatus: "Low Stock",
+    stockQuantity: 3,
     specs: ["Ultra-High Speed 1TB SSD", "Haptic Feedback Control", "4K-TV Gaming Output", "Ray Tracing Technology"],
     iconName: "Gamepad2"
   },
@@ -160,6 +165,7 @@ export const PRODUCTS: Product[] = [
     badge: "FREE WALL MOUNT",
     colors: ["Midnight Black"],
     stockStatus: "In Stock",
+    stockQuantity: 5,
     specs: ["55\" HDR 4K Screen", "Tizen Smart TV OS", "Object Tracking Sound Lite", "DSTV/Netflix Preloaded"],
     iconName: "Tv"
   },
@@ -167,7 +173,7 @@ export const PRODUCTS: Product[] = [
     id: "airpods-pro-2",
     name: "Apple AirPods Pro (2nd Gen, USB-C)",
     description: "Engineered for excellence. Delivers up to 2x more Active Noise Cancellation than its predecessor, Adaptive Audio, and Transparencies directly tuned to block city noise.",
-    price: 9500000 / 10, // 950,000
+    price: 950000,
     originalPrice: 1100000,
     category: "Accessories",
     rating: 4.8,
@@ -175,6 +181,7 @@ export const PRODUCTS: Product[] = [
     badge: "14% OFF",
     colors: ["Classic White"],
     stockStatus: "In Stock",
+    stockQuantity: 22,
     specs: ["Active Noise Cancelling", "Adaptive Transparency", "USB-C MagSafe Case", "Up to 6 hours listening"],
     iconName: "Headphones"
   },
@@ -190,6 +197,7 @@ export const PRODUCTS: Product[] = [
     badge: "RECOMMENDED",
     colors: ["Steel Gray"],
     stockStatus: "Out of Stock",
+    stockQuantity: 0,
     specs: ["100W Power Delivery", "Gallium Nitride (GaN) Tech", "3-Port Multi Charging", "ActiveShield Safety 2.0"],
     iconName: "Speaker"
   }

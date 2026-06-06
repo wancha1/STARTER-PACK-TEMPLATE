@@ -1,0 +1,32 @@
+{
+  "entities": {
+    "order": {
+      "title": "Order",
+      "description": "Customer purchase records",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner UID or 'guest'" },
+        "customerName": { "type": "string", "description": "Customer Full Name" },
+        "customerPhone": { "type": "string", "description": "Customer Phone" },
+        "deliveryArea": { "type": "string", "description": "Delivery Zone" },
+        "paymentMethod": { "type": "string", "description": "Method of Payment" },
+        "specialInstructions": { "type": "string", "description": "Additional notes" },
+        "orderId": { "type": "string", "description": "Unique Order Reference ID" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Order placement timestamp" },
+        "subtotal": { "type": "number", "description": "Order subtotal sum" },
+        "deliveryFee": { "type": "number", "description": "Order delivery fee" },
+        "discountAmount": { "type": "number", "description": "Order voucher discount" },
+        "totalAmount": { "type": "number", "description": "Grand total paid" },
+        "status": { "type": "string", "description": "Fulfillment status", "enum": ["Pending Dispatch", "Dispatched", "Completed"] },
+        "items": { "type": "array", "description": "List of ordered items" }
+      },
+      "required": ["userId", "customerName", "customerPhone", "orderId", "createdAt", "totalAmount", "items"]
+    }
+  },
+  "firestore": {
+    "/orders/{orderId}": {
+      "schema": "order",
+      "description": "Secure storage of customer electronics order tickets"
+    }
+  }
+}

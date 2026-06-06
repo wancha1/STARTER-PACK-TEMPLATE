@@ -103,6 +103,20 @@ export function parseCsvToProducts(csvString: string): Product[] {
       stockStatus = "Low Stock";
     }
 
+    const rawQuantity = record.stockquantity || record.stock_quantity || record.quantity || record.units || record.stock || record.inventory;
+    let stockQuantity: number | undefined = undefined;
+    if (rawQuantity !== undefined && rawQuantity !== null && rawQuantity !== "") {
+      const parsedQty = parseInt(rawQuantity, 10);
+      if (!isNaN(parsedQty)) {
+        stockQuantity = parsedQty;
+      }
+    }
+    if (stockQuantity === undefined) {
+      if (stockStatus === "Out of Stock") stockQuantity = 0;
+      else if (stockStatus === "Low Stock") stockQuantity = 3;
+      else if (stockStatus === "In Stock") stockQuantity = 12;
+    }
+
     // Validate icon fields or fallback based on category
     let iconName: Product["iconName"] = "Smartphone";
     const rawIcon = (record.iconname || record.icon_name || "").toLowerCase();
@@ -165,6 +179,7 @@ export function parseCsvToProducts(csvString: string): Product[] {
       colors,
       storages,
       stockStatus,
+      stockQuantity,
       iconName,
       images,
       videos,

@@ -32,6 +32,22 @@ import {
   ThumbsUp
 } from "lucide-react";
 
+// Safe JSON parses response helper to securely intercept and neutralize HTML-fallback error pages from crashing client
+async function parseSafeJson(response: Response) {
+  const contentType = response.headers.get("content-type");
+  if (contentType && contentType.toLowerCase().includes("application/json")) {
+    try {
+      return await response.json();
+    } catch (e) {
+      console.error("Malformed JSON response structure parsed:", e);
+      return { error: "Corrupted JSON content." };
+    }
+  }
+  const bodyText = await response.text();
+  console.warn("Interacted with non-JSON response payload. Body slice: ", bodyText.slice(0, 300));
+  return { error: `Server returned non-JSON representation (HTTP Status: ${response.status})` };
+}
+
 // Icon components mapping helper
 const getProductIcon = (iconName: string) => {
   switch (iconName) {
@@ -151,7 +167,7 @@ export default function Services() {
          })
       });
 
-      const data = await response.json();
+      const data = await parseSafeJson(response);
       if (!response.ok) {
         throw new Error(data.error || "Failed to submit restock alert subscription.");
       }
@@ -250,7 +266,7 @@ export default function Services() {
           setIsLoadingReviewsList(true);
           const response = await fetch(`/api/products/${selectedQuickViewProduct.id}/reviews`);
           if (response.ok) {
-            const data = await response.json();
+            const data = await parseSafeJson(response);
             setReviewsList(data.reviews || []);
           }
         } catch (err) {
@@ -287,7 +303,7 @@ export default function Services() {
         })
       });
 
-      const data = await response.json();
+      const data = await parseSafeJson(response);
       if (!response.ok) {
         throw new Error(data.error || "Failed to submit your product review.");
       }
@@ -330,7 +346,7 @@ export default function Services() {
         })
       });
 
-      const data = await response.json();
+      const data = await parseSafeJson(response);
       if (!response.ok) {
         throw new Error(data.error || "Failed to subscribe to price-drop alert tracker.");
       }
@@ -730,15 +746,20 @@ Please assign a tech concierge to review stock and delivery schedules at my conv
                       <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
 
                       {/* Stock indicator badge */}
-                      <span className={`absolute bottom-4 right-4 text-[9px] font-mono tracking-widest uppercase font-semibold px-3 py-1 rounded-xl border backdrop-blur-md ${
-                        product.stockStatus === "In Stock"
-                          ? "bg-black/60 border-emerald-500/20 text-emerald-400"
-                          : product.stockStatus === "Low Stock"
-                          ? "bg-black/60 border-amber-500/20 text-amber-450 text-amber-400"
-                          : "bg-black/60 border-rose-500/25 text-rose-400 bg-rose-950/15"
-                      }`}>
-                        {product.stockStatus}
-                      </span>
+                      {product.stockStatus === "Out of Stock" || (product.stockQuantity !== undefined && product.stockQuantity === 0) ? (
+                        <span className="absolute bottom-4 right-4 text-[9px] font-mono tracking-widest uppercase font-semibold px-3 py-1 rounded-xl border backdrop-blur-md bg-black/60 border-rose-500/25 text-rose-450 text-rose-400 bg-rose-950/15">
+                          Out of Stock
+                        </span>
+                      ) : (product.stockQuantity !== undefined && product.stockQuantity < 5) || product.stockStatus === "Low Stock" ? (
+                        <span className="absolute bottom-4 right-4 text-[9px] font-mono tracking-widest uppercase font-semibold px-3 py-1 rounded-xl border backdrop-blur-md bg-amber-950/40 border-amber-500/40 text-amber-300 animate-pulse flex items-center gap-1 shadow-[0_0_12px_rgba(245,158,11,0.2)]">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping inline-block" />
+                          ⚠️ LOW STOCK {product.stockQuantity !== undefined ? `(${product.stockQuantity} Left)` : ""}
+                        </span>
+                      ) : (
+                        <span className="absolute bottom-4 right-4 text-[9px] font-mono tracking-widest uppercase font-semibold px-3 py-1 rounded-xl border backdrop-blur-md bg-black/60 border-emerald-500/20 text-emerald-400">
+                          {product.stockStatus}
+                        </span>
+                      )}
 
                       {/* Promo Badging if active */}
                       {product.badge && (

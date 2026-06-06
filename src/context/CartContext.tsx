@@ -400,11 +400,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
           credentials: "include"
         });
         if (res.ok) {
-          const data = await res.json();
-          if (data.success && data.user) {
-            setAdminUser(data.user);
-            setCsrfToken(data.csrfToken || null);
-            return; // Cookie session active, skip standard Supabase guest lookups
+          const contentType = res.headers.get("content-type");
+          if (contentType && contentType.includes("application/json")) {
+            const data = await res.json();
+            if (data.success && data.user) {
+              setAdminUser(data.user);
+              setCsrfToken(data.csrfToken || null);
+              return; // Cookie session active, skip standard Supabase guest lookups
+            }
           }
         }
       } catch (err) {
@@ -506,6 +509,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const res = await fetch("/products/products.json");
       if (!res.ok) {
         throw new Error(`Failed to load product database (HTTP ${res.status})`);
+      }
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("Server returned non-JSON configuration format for product database");
       }
       const data = await res.json();
       if (Array.isArray(data)) {

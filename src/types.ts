@@ -42,6 +42,7 @@ export interface Product {
   colors?: string[];
   storages?: string[];
   stockStatus: "In Stock" | "Low Stock" | "Out of Stock";
+  stockQuantity?: number;
   iconName: "Smartphone" | "Laptop" | "Tv" | "Gamepad2" | "Watch" | "Headphones" | "Camera" | "Speaker";
   // Media & Scalable spec additions
   images?: string[];
