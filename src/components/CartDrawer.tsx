@@ -1,10 +1,10 @@
 import { useState, FormEvent, useEffect } from "react";
 import { useCart } from "../context/CartContext";
-import { X, ShoppingBag, Plus, Minus, Trash2, Smartphone, ShieldCheck, HelpCircle, FileText, ArrowRight, Loader2, Calendar, DollarSign, AlertCircle, CheckCircle, Clock } from "lucide-react";
+import { X, ShoppingBag, Plus, Minus, Trash2, Smartphone, ShieldCheck, HelpCircle, FileText, ArrowRight, Loader2, Calendar, DollarSign, AlertCircle, CheckCircle, Clock, Search, Truck, MapPin, Package } from "lucide-react";
 import { BUSINESS_INFO } from "../data";
 import { motion, AnimatePresence } from "motion/react";
 import { db } from "../lib/firebase";
-import { collection, addDoc, getDocs, query, where, orderBy } from "firebase/firestore";
+import { collection, addDoc, getDocs, query, where, orderBy, doc, getDoc, setDoc } from "firebase/firestore";
 
 // High-quality Unsplash image mapping for individual items
 const getProductImageUrl = (product: any) => {
@@ -84,10 +84,17 @@ export default function CartDrawer() {
   const [discountAmount, setDiscountAmount] = useState(0);
 
   // Order history states
-  const [activeTab, setActiveTab] = useState<"cart" | "history">("cart");
+  const [activeTab, setActiveTab] = useState<"cart" | "history" | "track">("cart");
   const [orderHistory, setOrderHistory] = useState<any[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [historyError, setHistoryError] = useState("");
+
+  // Order tracking states
+  const [trackOrderId, setTrackOrderId] = useState("");
+  const [trackedOrder, setTrackedOrder] = useState<any>(null);
+  const [isTrackingLoading, setIsTrackingLoading] = useState(false);
+  const [trackingError, setTrackingError] = useState("");
+  const [hasSearchedTrack, setHasSearchedTrack] = useState(false);
 
   // Firestore Error Handler helper conforming to instructions
   const handleFirestoreError = (error: unknown, opType: string, path: string | null) => {
@@ -170,6 +177,45 @@ export default function CartDrawer() {
       fetchOrderHistory();
     }
   }, [customerUser, activeTab]);
+
+  const handleTrackOrder = async (orderIdToTrack?: string) => {
+    const targetId = orderIdToTrack || trackOrderId;
+    const sanitized = targetId.trim().replace(/^#/, "").toUpperCase();
+    if (!sanitized) {
+      setTrackingError("Please enter a valid Order Reference (e.g. APX-910403)");
+      return;
+    }
+
+    setIsTrackingLoading(true);
+    setTrackingError("");
+    setTrackedOrder(null);
+    setHasSearchedTrack(true);
+
+    try {
+      const docRef = doc(db, "orders", sanitized);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setTrackedOrder({ id: docSnap.id, ...docSnap.data() });
+      } else {
+        // Fallback search using orderId query for any legacy/autoID-created order structures
+        const q = query(collection(db, "orders"), where("orderId", "==", sanitized));
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          const matchedDoc = querySnapshot.docs[0];
+          setTrackedOrder({ id: matchedDoc.id, ...matchedDoc.data() });
+        } else {
+          setTrackingError(`Order reference #${sanitized} could not be found.`);
+        }
+      }
+    } catch (err: any) {
+      console.error("Order tracking error:", err);
+      setTrackingError("Server permission or connection error tracking order details.");
+      handleFirestoreError(err, "get", `orders/${sanitized}`);
+    } finally {
+      setIsTrackingLoading(false);
+    }
+  };
 
   // Scalable SVG Bar + Area Chart representing cart item pricing
   const renderCartChart = () => {
@@ -407,11 +453,11 @@ Hello ${BUSINESS_INFO.name}! 👋 I placed an order via your online store. Pleas
     // Save order payload to Firestore
     const saveOrderToFirestore = async () => {
       try {
-        await addDoc(collection(db, "orders"), orderData);
+        await setDoc(doc(db, "orders", orderId), orderData);
         console.log("Order saved to Firestore successfully!");
       } catch (err) {
         console.error("Failed to save order to Firestore:", err);
-        handleFirestoreError(err, "create", "orders");
+        handleFirestoreError(err, "create", `orders/${orderId}`);
       }
     };
     saveOrderToFirestore();
@@ -495,13 +541,13 @@ Hello ${BUSINESS_INFO.name}! 👋 I placed an order via your online store. Pleas
                 <button
                   type="button"
                   onClick={() => setActiveTab("cart")}
-                  className={`flex-1 py-1.5 text-center text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                  className={`flex-1 py-1.5 text-center text-[11px] font-bold rounded-lg transition-all cursor-pointer ${
                     activeTab === "cart"
                       ? "bg-blue-600 font-extrabold text-white shadow-lg shadow-blue-600/15"
                       : "text-slate-400 hover:text-white"
                   }`}
                 >
-                  Current Cart ({cartCount})
+                  Cart ({cartCount})
                 </button>
                 <button
                   type="button"
@@ -509,14 +555,26 @@ Hello ${BUSINESS_INFO.name}! 👋 I placed an order via your online store. Pleas
                     setActiveTab("history");
                     fetchOrderHistory();
                   }}
-                  className={`flex-1 py-1.5 text-center text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                  className={`flex-1 py-1.5 text-center text-[11px] font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1 ${
                     activeTab === "history"
                       ? "bg-blue-600 font-extrabold text-white shadow-lg shadow-blue-600/15"
                       : "text-slate-400 hover:text-white"
                   }`}
                 >
                   <FileText className="w-3.5 h-3.5" />
-                  Order History
+                  History
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("track")}
+                  className={`flex-1 py-1.5 text-center text-[11px] font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1 ${
+                    activeTab === "track"
+                      ? "bg-blue-600 font-extrabold text-white shadow-lg shadow-blue-600/15"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  <Truck className="w-3.5 h-3.5" />
+                  Track Order
                 </button>
               </div>
             )}
@@ -643,22 +701,312 @@ Hello ${BUSINESS_INFO.name}! 👋 I placed an order via your online store. Pleas
                               </div>
                             </div>
 
-                            <div className="pt-1">
+                            <div className="pt-1 flex gap-2">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setTrackOrderId(order.orderId);
+                                  setActiveTab("track");
+                                  handleTrackOrder(order.orderId);
+                                }}
+                                className="flex-1 py-1.5 rounded-lg text-[10px] font-mono uppercase bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 border border-blue-500/20 font-bold transition-all flex items-center justify-center gap-1 cursor-pointer font-sans"
+                              >
+                                <Truck className="w-3.5 h-3.5 text-blue-400" />
+                                <span>Track Status</span>
+                              </button>
+                              
                               <button
                                 type="button"
                                 onClick={() => {
                                   const queryText = `Hello Apex Devices! 👋 Inquiring about my Order reference #${order.orderId} containing: ${order.items?.map((it: any) => `${it.qty}x ${it.name}`).join(", ")}. Please send me delivery status updates!`;
                                   window.open(`https://wa.me/${BUSINESS_INFO.whatsappNumber}?text=${encodeURIComponent(queryText)}`, "_blank");
                                 }}
-                                className="w-full py-1.5 rounded-lg text-[9px] font-mono uppercase bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#25D366] border border-[#25D366]/20 font-bold transition-all flex items-center justify-center gap-1 cursor-pointer font-sans"
+                                className="flex-1 py-1.5 rounded-lg text-[10px] font-mono uppercase bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#25D366] border border-[#25D366]/20 font-bold transition-all flex items-center justify-center gap-1 cursor-pointer font-sans"
                               >
-                                <Smartphone className="w-3 h-3" />
-                                Inquire Status via WhatsApp
+                                <Smartphone className="w-3.5 h-3.5 text-emerald-400" />
+                                <span>WhatsApp Call</span>
                               </button>
                             </div>
                           </div>
                         ))}
                       </div>
+                    </div>
+                  )}
+                </div>
+              ) : activeTab === "track" && !isCheckingOut ? (
+                // ORDER TRACKING VIEW
+                <div className="space-y-5">
+                  <div className="bg-white/3 border border-white/5 rounded-2xl p-4 text-left space-y-4">
+                    <div className="flex items-center gap-2">
+                      <Search className="w-4 h-4 text-blue-400" />
+                      <span className="text-xs font-bold text-white font-sans uppercase tracking-wider">
+                        Real-time Order Tracker
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-400 leading-relaxed font-light">
+                      Track any order placed with Apex Devices. Enter your unique order code provided after checkout.
+                    </p>
+
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-[9px] uppercase font-mono tracking-widest text-slate-500 mb-1.5 font-bold">
+                          Order ID / Reference Code
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="text"
+                            placeholder="e.g. APX-910403"
+                            value={trackOrderId}
+                            onChange={(e) => {
+                              setTrackOrderId(e.target.value);
+                              setTrackingError("");
+                            }}
+                            className="w-full bg-black/60 border border-white/10 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-xl py-3 pl-3 pr-10 text-xs text-white font-mono placeholder-slate-600 outline-none uppercase"
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                handleTrackOrder();
+                              }
+                            }}
+                          />
+                          <Search className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleTrackOrder()}
+                        disabled={isTrackingLoading}
+                        className="w-full py-2.5 rounded-xl text-xs font-bold font-sans uppercase tracking-wider text-white bg-blue-600 hover:bg-blue-700 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                      >
+                        {isTrackingLoading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin text-white" />
+                            <span>Locating Order...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Search className="w-3.5 h-3.5" />
+                            <span>Query Status</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    {trackingError && (
+                      <div className="flex gap-2 p-3.5 rounded-xl bg-red-500/5 border border-red-500/15 text-left text-xs text-red-400">
+                        <AlertCircle className="w-4 h-4 shrink-0" />
+                        <span>{trackingError}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {isTrackingLoading ? (
+                    <div className="py-12 flex flex-col items-center justify-center text-center">
+                      <Loader2 className="w-8 h-8 text-blue-500 animate-spin mb-3" />
+                      <p className="text-xs text-slate-500 font-mono">Synchronizing with showroom logs...</p>
+                    </div>
+                  ) : trackedOrder ? (
+                    <div className="space-y-4 text-left">
+                      {/* Tracking Details Card */}
+                      <div className="bg-white/3 border border-white/10 rounded-2xl p-5 space-y-5">
+                        {/* Summary Header */}
+                        <div className="flex justify-between items-start border-b border-white/5 pb-4">
+                          <div>
+                            <span className="text-xs font-mono font-bold text-white block">
+                              Reference: #{trackedOrder.orderId}
+                            </span>
+                            <span className="text-[10px] text-slate-500 font-mono mt-1 flex items-center gap-1">
+                              <Calendar className="w-3 h-3 text-slate-600" />
+                              {trackedOrder.createdAt ? new Date(trackedOrder.createdAt).toLocaleDateString("en-US", {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                                hour: "numeric",
+                                minute: "2-digit"
+                              }) : "Recently placed"}
+                            </span>
+                          </div>
+                          <span className="text-[9px] font-mono tracking-wider uppercase font-extrabold px-2.5 py-1 rounded-md border border-sky-500/20 text-sky-400 bg-sky-950/10">
+                            {trackedOrder.status || "Pending Dispatch"}
+                          </span>
+                        </div>
+
+                        {/* Interactive Status Milestone Progress Timeline Bar */}
+                        <div className="space-y-2">
+                          <span className="text-[9px] uppercase font-mono tracking-widest text-slate-500 font-bold block">
+                            Milestone Status Tracking
+                          </span>
+                          <div className="relative pt-6 pb-2 px-3">
+                            {/* Connecting Line background */}
+                            <div className="absolute top-1/2 left-3 right-3 h-[2px] bg-white/5 -translate-y-1/2 z-0" />
+                            
+                            {/* Running Line fill */}
+                            <div 
+                              className="absolute top-1/2 left-3 h-[2px] bg-gradient-to-r from-blue-500 to-emerald-500 -translate-y-1/2 z-0 transition-all duration-500"
+                              style={{ 
+                                width: trackedOrder.status === "Completed" ? "calc(100% - 24px)" : 
+                                       trackedOrder.status === "Dispatched" ? "50%" : "0%" 
+                              }}
+                            />
+
+                            {/* Node indicators */}
+                            <div className="relative flex justify-between z-10 font-sans text-[10px]">
+                              {/* Step 1: Placed */}
+                              <div className="flex flex-col items-center">
+                                <div className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-[10px] ring-4 ring-[#05050c] border border-blue-400">
+                                  ✓
+                                </div>
+                                <span className="text-[9px] mt-2 font-mono text-blue-400 font-bold uppercase tracking-wider">Placed</span>
+                              </div>
+
+                              {/* Step 2: Dispatched */}
+                              <div className="flex flex-col items-center">
+                                <div className={`w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] ring-4 ring-[#05050c] border transition-colors ${
+                                  trackedOrder.status === "Dispatched" || trackedOrder.status === "Completed"
+                                    ? "bg-blue-600 border-blue-400 text-white"
+                                    : "bg-neutral-900 border-white/5 text-slate-600"
+                                }`}>
+                                  {trackedOrder.status === "Dispatched" || trackedOrder.status === "Completed" ? "✓" : "2"}
+                                </div>
+                                <span className={`text-[9px] mt-2 font-mono uppercase tracking-wider ${
+                                  trackedOrder.status === "Dispatched" || trackedOrder.status === "Completed"
+                                    ? "text-blue-400 font-bold"
+                                    : "text-slate-600 font-medium"
+                                }`}>Dispatched</span>
+                              </div>
+
+                              {/* Step 3: Delivered */}
+                              <div className="flex flex-col items-center">
+                                <div className={`w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] ring-4 ring-[#05050c] border transition-colors ${
+                                  trackedOrder.status === "Completed"
+                                    ? "bg-emerald-600 border-emerald-400 text-white"
+                                    : "bg-neutral-900 border-white/5 text-slate-600"
+                                }`}>
+                                  {trackedOrder.status === "Completed" ? "✓" : "3"}
+                                </div>
+                                <span className={`text-[9px] mt-2 font-mono uppercase tracking-wider ${
+                                  trackedOrder.status === "Completed"
+                                    ? "text-emerald-400 font-bold"
+                                    : "text-slate-600 font-medium"
+                                }`}>Delivered</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Order Goods list */}
+                        <div className="space-y-2 border-t border-b border-white/5 py-4">
+                          <span className="text-[9px] uppercase font-mono tracking-widest text-slate-500 font-bold block">
+                            Gadgets Ordered
+                          </span>
+                          <div className="space-y-2">
+                            {trackedOrder.items?.map((item: any, idx: number) => (
+                              <div key={idx} className="flex justify-between items-center text-xs">
+                                <div className="text-slate-200 font-medium truncate max-w-[220px]">
+                                  {item.name}
+                                  {item.selectedColor && (
+                                    <span className="text-[9px] text-slate-500 font-mono block">
+                                      Color: {item.selectedColor}
+                                    </span>
+                                  )}
+                                  {item.selectedStorage && (
+                                    <span className="text-[9px] text-slate-500 font-mono block">
+                                      Storage: {item.selectedStorage}
+                                    </span>
+                                  )}
+                                </div>
+                                <span className="text-slate-400 font-mono font-medium text-[11px] shrink-0">
+                                  {item.qty} &times; {formatCurrency(item.price)}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Customer Metadata Profile */}
+                        <div className="space-y-3 text-xs leading-relaxed">
+                          <div className="grid grid-cols-2 gap-3 pb-3 border-b border-white/5 text-left">
+                            <div>
+                              <span className="text-[8px] uppercase font-mono text-slate-500 tracking-wider block mb-0.5">
+                                Client Directory
+                              </span>
+                              <span className="text-white font-medium block truncate">
+                                {trackedOrder.customerName}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-[8px] uppercase font-mono text-slate-500 tracking-wider block mb-0.5">
+                                Delivery Zone
+                              </span>
+                              <span className="text-white font-medium block truncate">
+                                {trackedOrder.deliveryArea || "Store pickup"}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-3 text-left">
+                            <div>
+                              <span className="text-[8px] uppercase font-mono text-slate-500 tracking-wider block mb-0.5">
+                                Payment Channel
+                              </span>
+                              <span className="text-white font-medium block truncate text-[11px]">
+                                {trackedOrder.paymentMethod}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-[8px] uppercase font-mono text-slate-500 tracking-wider block mb-0.5">
+                                Billing Receipt
+                              </span>
+                              <span className="text-sky-400 font-mono font-bold block">
+                                {formatCurrency(trackedOrder.totalAmount || trackedOrder.subtotal)}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* WhatsApp Inquiry */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const queryText = `Hello Apex Devices! 👋 Tracking client inquiring for status update on Order ref #${trackedOrder.orderId}. Dispatch milestones status showing as [${trackedOrder.status || "Pending Dispatch"}]. Please send latest dispatch updates!`;
+                          window.open(`https://wa.me/${BUSINESS_INFO.whatsappNumber}?text=${encodeURIComponent(queryText)}`, "_blank");
+                        }}
+                        className="w-full py-3 rounded-xl text-xs font-bold uppercase tracking-wider text-white bg-[#25D366] hover:bg-[#20ba54] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-green-500/10"
+                      >
+                        <Smartphone className="w-4 h-4 text-green-100" />
+                        <span>Inquire Delivery via WhatsApp</span>
+                      </button>
+                    </div>
+                  ) : hasSearchedTrack ? (
+                    <div className="py-10 px-4 flex flex-col items-center justify-center text-center bg-white/[0.01] border border-white/5 rounded-2xl">
+                      <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-500 mb-4 animate-pulse">
+                        <AlertCircle className="w-5 h-5 text-amber-500" />
+                      </div>
+                      <h6 className="text-xs font-semibold text-white mb-1.5">No Matching Order Located</h6>
+                      <p className="text-[11px] text-slate-500 max-w-xs leading-relaxed font-light mb-4">
+                        We couldn't pull any order corresponding to this reference in our Cloud register. Please double check that you formatted the letters exactly as they appear in your receipt (e.g. including dashes like <strong className="font-mono text-slate-300">APX-102943</strong>).
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setHasSearchedTrack(false)}
+                        className="px-4 py-2 border border-white/10 text-slate-400 hover:text-white rounded-xl text-[10px] font-mono transition-all uppercase tracking-wider cursor-pointer"
+                      >
+                        Reset Tracker
+                      </button>
+                    </div>
+                  ) : (
+                    // Prompt state info
+                    <div className="py-8 px-4 flex flex-col items-center justify-center text-center bg-white/[0.01] border border-white/5 rounded-2xl">
+                      <div className="w-10 h-10 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-3.5 shadow-inner">
+                        <Package className="w-4 h-4" />
+                      </div>
+                      <h6 className="text-[11px] font-bold text-slate-200 uppercase tracking-wider mb-1.5">Order Tracking Guide</h6>
+                      <ul className="text-[10px] text-slate-550 space-y-2 max-w-[280px] leading-relaxed text-left font-light list-inside list-disc">
+                        <li>References are generated instantly as soon as you place your order.</li>
+                        <li>Verify live showroom status, dispatch routes, and billing details.</li>
+                        <li>Guest and authenticated orders can both be checked 24/7.</li>
+                      </ul>
                     </div>
                   )}
                 </div>

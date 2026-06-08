@@ -1,8 +1,8 @@
 import { Service, TrustSignal, Testimonial, Product } from "./types";
 
 export const BUSINESS_INFO = {
-  name: "Apex Mega Mall",
-  tagline: "Lira's Favorite Online Marketplace for Genuine Tech & Mega Deals",
+  name: "Solo's phones and electronics",
+  tagline: "Lira's Favorite Online Marketplace for Genuine Phones & Electronics",
   subTagline: "Uganda's fast-growing online retail store for genuine gadgets. Secure extreme discounts on authentic smartphones, Apple Silicon MacBooks, crisp smart screens, and console bundles with doorstep logistics.",
   whatsappNumber: "256772604777", // Standard international format without '+' for API
   whatsappDisplay: "+256 772 604 777",

@@ -31,12 +31,12 @@ const getEnvVal = (key: string, fallback: string): string => {
 };
 
 const firebaseConfig = {
-  apiKey: firebaseAppletConfig.apiKey || getEnvVal("VITE_FIREBASE_API_KEY", "AIzaSyBD8pHCfAFB9v5CVld1xJ68PsF02Bk83g4"),
-  authDomain: firebaseAppletConfig.authDomain || getEnvVal("VITE_FIREBASE_AUTH_DOMAIN", "electric-tesla-497514-r1.firebaseapp.com"),
-  projectId: firebaseAppletConfig.projectId || getEnvVal("VITE_FIREBASE_PROJECT_ID", "electric-tesla-497514-r1"),
-  storageBucket: firebaseAppletConfig.storageBucket || getEnvVal("VITE_FIREBASE_STORAGE_BUCKET", "electric-tesla-497514-r1.firebasestorage.app"),
-  messagingSenderId: firebaseAppletConfig.messagingSenderId || getEnvVal("VITE_FIREBASE_MESSAGING_SENDER_ID", "612717024838"),
-  appId: firebaseAppletConfig.appId || getEnvVal("VITE_FIREBASE_APP_ID", "1:612717024838:web:7455548b2871888d269c47")
+  apiKey: getEnvVal("VITE_FIREBASE_API_KEY", firebaseAppletConfig.apiKey || "AIzaSyCm8dWGT8Up2pRwxsZOQsSz_GiY2SzbQlo"),
+  authDomain: getEnvVal("VITE_FIREBASE_AUTH_DOMAIN", firebaseAppletConfig.authDomain || "gen-lang-client-0207053136.firebaseapp.com"),
+  projectId: getEnvVal("VITE_FIREBASE_PROJECT_ID", firebaseAppletConfig.projectId || "gen-lang-client-0207053136"),
+  storageBucket: getEnvVal("VITE_FIREBASE_STORAGE_BUCKET", firebaseAppletConfig.storageBucket || "gen-lang-client-0207053136.firebasestorage.app"),
+  messagingSenderId: getEnvVal("VITE_FIREBASE_MESSAGING_SENDER_ID", firebaseAppletConfig.messagingSenderId || "863997008927"),
+  appId: getEnvVal("VITE_FIREBASE_APP_ID", firebaseAppletConfig.appId || "1:863997008927:web:fe8f2d6d5868e54576892a")
 };
 
 const app = initializeApp(firebaseConfig);

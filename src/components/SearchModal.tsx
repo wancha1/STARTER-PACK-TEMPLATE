@@ -6,6 +6,16 @@ import { motion, AnimatePresence } from "motion/react";
 
 // Context appropriate Unsplash product photography helper
 const getSearchProductImageUrl = (product: any) => {
+  if (product.images && product.images.length > 0 && product.images[0]) {
+    return product.images[0];
+  }
+  if (product.image) {
+    return product.image;
+  }
+  if (product.imageUrl) {
+    return product.imageUrl;
+  }
+
   const images: Record<string, string> = {
     "iphone-15-pro-max": "https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=300&q=80",
     "galaxy-s24-ultra": "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=300&q=80",

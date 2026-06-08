@@ -40,8 +40,10 @@ service cloud.firestore {
           && data.items.size() > 0;
       }
 
-      // Read rules: Users can list and get their own orders
-      allow get, list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      // Read rules: Everyone can fetch a single order by its exact ID (e.g., for order tracking),
+      // but listing/querying multiple orders is strictly gated by owner auth.
+      allow get: if true;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
 
       // Create rules: Users can place orders under their authentic UID or as a guest. 
       // If signed in, their userId field must match their authenticated auth.uid exactly.

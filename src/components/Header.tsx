@@ -47,7 +47,7 @@ export default function Header() {
 
   const navLinks = [
     { name: "Live Catalog", href: "#services" },
-    { name: "Why Apex", href: "#why-us" },
+    { name: "Why Solo's", href: "#why-us" },
     { name: "Our Legacy", href: "#about" },
     { name: "Reviews", href: "#testimonials" },
     { name: "Contact Store", href: "#contact" },
@@ -73,15 +73,15 @@ export default function Header() {
           {/* Logo */}
           <a href="#" className="flex items-center gap-2 group transition-all duration-300 hover:scale-[1.05] hover:drop-shadow-[0_0_15px_rgba(59,130,246,0.65)]" id="nav-logo">
             <div className="relative w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.6)] transition-all duration-300">
-              <span className="font-display font-medium text-white text-lg">A</span>
+              <span className="font-display font-medium text-white text-lg">S</span>
               <div className="absolute inset-0 rounded-xl bg-gradient-to-tr from-blue-500 to-purple-600 blur opacity-40 group-hover:opacity-100 transition-opacity duration-300 -z-10" />
             </div>
              <div className="flex flex-col text-left">
               <span className="font-display font-semibold tracking-tight text-white text-lg leading-tight flex items-center gap-1 group-hover:text-blue-300 transition-colors">
-                Apex <span className="text-blue-400 group-hover:text-white transition-colors">Devices</span>
+                Solo's <span className="text-blue-400 group-hover:text-white transition-colors">Phones</span>
               </span>
               <span className="text-[9px] font-mono font-medium text-blue-400 capitalize tracking-wider leading-none">
-                online store
+                electronics
               </span>
             </div>
           </a>

@@ -68,11 +68,21 @@ const getProductIcon = (iconName: string) => {
 
 // High-quality, context-appropriate Unsplash product photography mapping helper
 const getProductImageUrl = (product: any) => {
+  if (product.images && product.images.length > 0 && product.images[0]) {
+    return product.images[0];
+  }
+  if (product.image) {
+    return product.image;
+  }
+  if (product.imageUrl) {
+    return product.imageUrl;
+  }
+
   const images: Record<string, string> = {
     "iphone-15-pro-max": "https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=1200&q=80",
     "galaxy-s24-ultra": "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=1200&q=80",
     "macbook-pro-m3": "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1200&q=80",
-    "hp-elitebook-840": "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=1200&q=80",
+    "hp-elitebook-840": "https://images.unsplash.com/photo-158872657578-7efd1f1555ed?auto=format&fit=crop&w=1200&q=80",
     "sony-ps5-slim": "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&w=1200&q=80",
     "samsung-55-4k": "https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=1200&q=80",
     "airpods-pro-2": "https://images.unsplash.com/photo-1588449668338-d13417f16cd9?auto=format&fit=crop&w=1200&q=80",

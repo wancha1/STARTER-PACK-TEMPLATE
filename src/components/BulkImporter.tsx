@@ -266,7 +266,7 @@ export default function BulkImporter() {
          body: JSON.stringify({ productId }),
          credentials: "include"
       });
-      const resData = await res.json();
+      const resData = await parseSafeJson(res);
       if (!res.ok) {
         throw new Error(resData.error || "Failed to release restock.");
       }
@@ -332,7 +332,7 @@ export default function BulkImporter() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: recoveryEmail.toLowerCase().trim() })
       });
-      const data = await res.json();
+      const data = await parseSafeJson(res);
       if (res.ok) {
         setRecoverySuccess(data.message || "Recovery code generated and printed to server logs!");
       } else {
@@ -361,7 +361,7 @@ export default function BulkImporter() {
           newPassword: recoveryNewPassword
         })
       });
-      const data = await res.json();
+      const data = await parseSafeJson(res);
       if (res.ok) {
         setRecoverySuccess(data.message || "Password updated successfully. You can now sign in!");
         setRecoveryTokenInput("");
@@ -396,7 +396,7 @@ export default function BulkImporter() {
           newPassword: recoveryNewPassword
         })
       });
-      const data = await res.json();
+      const data = await parseSafeJson(res);
       if (res.ok) {
         setRecoverySuccess(data.message || "Credentials updated successfully via Master Security Key!");
         setRecoveryTokenInput("");
@@ -432,7 +432,7 @@ export default function BulkImporter() {
           newPassword: recoveryNewPassword
         })
       });
-      const data = await res.json();
+      const data = await parseSafeJson(res);
       if (res.ok) {
         setRecoverySuccess(data.message || "Credentials recovered via security questions!");
         setRecoveryAnswer1("");
@@ -972,7 +972,7 @@ export default function BulkImporter() {
           throw new Error(errData.error || `Upload failed: ${res.statusText}`);
         }
 
-        const data = await res.json();
+        const data = await res.json().catch(() => ({}));
         if (data.success && data.file) {
           setUploadedUrls((prev) => [
             {
