@@ -26,34 +26,34 @@ export default function Hero() {
   // Premium blue/purple/indigo sliding promotions
   const slides = [
     {
-      title: "APEX PREMIER SAVINGS",
-      tagline: "High-End Gadgets & Top Deals",
-      description: "Discover verified genuine flagship electronics in Uganda. Brand new sealed smartphones, official Apple MacBooks, and high-performance headsets with full warranties.",
-      accentText: "Phones Super Week",
-      cta: "Explore Tech Deals",
-      image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80",
-      color: "from-blue-600 to-indigo-800",
-      badge: "SAME-DAY DELIVERY"
+      title: "🔥 SOLO'S SUPERWEEK SALE",
+      tagline: "Genuine Flagship Phones Up to -15%",
+      description: "Discover verified genuine sealed Apple iPhones, official Samsung Galaxy flagships, and fast-charging accessories. Delivered same-day in Lira with corporate warranty cards.",
+      accentText: "Solo's Phone Super Week",
+      cta: "Explore Solo's Phone Deals",
+      image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=80",
+      color: "from-amber-600 to-red-650",
+      badge: "SEALED GENUINE STOCK"
     },
     {
-      title: "OFFICIAL BRANDS EXTRAVAGANZA",
-      tagline: "Ultra high-speed M3 Laptops",
-      description: "Empower your corporate office or design workflow. Premium metal chassis business notebooks pre-packaged with free waterproof cases and local office suites.",
+      title: "💻 SOLO'S COMPUTERE BUNDLES",
+      tagline: "Ultra speed Apple Silicon MacBooks",
+      description: "Empower your corporate office, agency, or study hub. High-performance metal business laptops pre-packaged with official office suites and premium carrying cases.",
       accentText: "Save up to 600K UGX",
-      cta: "Browse Computing",
-      image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=80",
+      cta: "Browse Solo's Computers",
+      image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1200&q=80",
       color: "from-blue-600 to-indigo-700",
-      badge: "OFFICIAL WARRANTY"
+      badge: "OFFICIAL LOCAL WARRANTY"
     },
     {
-      title: "HOME CINEMA & GAMING BUNDLES",
-      tagline: "4K Frameless Screens & PS5 Consoles",
-      description: "Transform your living room or entertainment lounge. Get same-day mounting layouts with digital surge protectors and multiple titles preloaded free.",
-      accentText: "Limited Stock Units",
-      cta: "Explore Home Tech",
-      image: "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&w=800&q=80",
+      title: "📺 SOLO'S SMART SHOWCASE",
+      tagline: "4K Frameless Smart TVs & Audio Systems",
+      description: "Redefine your living room with ultra-slim bezel 4K displays and heavy-bass soundbars. Includes digital surge protectors and complementary wall mount brackets.",
+      accentText: "Limited Store Stock",
+      cta: "View Home Screens",
+      image: "https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=1200&q=80",
       color: "from-purple-600 to-indigo-800",
-      badge: "FREE WALL MOUNT"
+      badge: "FREE PREMIUM WALL MOUNT"
     }
   ];
 
@@ -227,20 +227,23 @@ export default function Hero() {
           <div className="col-span-1 lg:col-span-2 flex flex-col justify-between gap-3">
             
             {/* Widget 1: Fast Delivery Tracker */}
-            <div className="bg-neutral-950/80 border border-white/5 rounded-2xl p-4 text-left flex-1 flex flex-col justify-between">
+            <div className="bg-neutral-950/80 border border-white/5 hover:border-blue-500/20 hover:bg-neutral-900/40 rounded-2xl p-4 text-left flex-1 flex flex-col justify-between transition-all duration-300 hover:-translate-y-0.5 group">
               <div>
                 <div className="flex items-center justify-between gap-2 mb-2">
                   <span className="text-[9px] font-mono tracking-wider uppercase text-slate-500 font-bold block">
                     FAST SHIPPING
                   </span>
-                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                  <span className="relative flex h-2 w-2 shrink-0">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
                 </div>
-                <h4 className="text-xs font-bold text-white mb-1">Express Dispatch</h4>
+                <h4 className="text-xs font-bold text-white mb-1 group-hover:text-blue-400 transition-colors">Express Dispatch</h4>
                 <p className="text-[10px] text-slate-400 leading-normal font-sans">
                   Doorstep shipping within 3 hours directly in Lira.
                 </p>
               </div>
-              <div className="mt-3 bg-white/3 border border-white/5 p-2 rounded-xl flex items-center justify-between font-mono text-[9px] text-slate-300">
+              <div className="mt-3 bg-white/5 border border-white/10 p-2 rounded-xl flex items-center justify-between font-mono text-[9px] text-slate-300">
                 <span className="flex items-center gap-1">
                   <Clock className="w-3 h-3 text-blue-400" />
                   <span>Time:</span>
@@ -250,35 +253,39 @@ export default function Hero() {
             </div>
 
             {/* Widget 2: Escrow Money refund flow */}
-            <div className="bg-neutral-950/80 border border-white/5 rounded-2xl p-4 text-left flex-1 flex flex-col justify-between">
+            <div className="bg-neutral-950/80 border border-white/5 hover:border-purple-500/20 hover:bg-neutral-900/40 rounded-2xl p-4 text-left flex-1 flex flex-col justify-between transition-all duration-300 hover:-translate-y-0.5 group">
               <div>
                 <span className="text-[9px] font-mono tracking-wider uppercase text-slate-500 font-bold block mb-2">
                   100% SECURE PAY
                 </span>
-                <h4 className="text-xs font-bold text-white mb-1">Mobile Money Escrow</h4>
+                <h4 className="text-xs font-bold text-white mb-1 group-hover:text-purple-400 transition-colors">Mobile Money Escrow</h4>
                 <p className="text-[10px] text-slate-400 leading-normal font-sans">
                   Pay upon secure physical delivery. Immediate verification and exchange.
                 </p>
               </div>
-              <div className="mt-2 text-[9px] text-slate-500 uppercase tracking-tight flex items-center gap-1.5 bg-neutral-900 border border-white/5 p-1.5 rounded-lg font-mono">
-                <span className="text-blue-400">✓</span> MTNi / Airtel Cash Cards
+              <div className="mt-2 text-[9px] text-slate-300 uppercase tracking-wide flex items-center justify-between bg-neutral-900 border border-white/5 p-1.5 rounded-lg font-mono">
+                <span className="text-emerald-400 font-bold flex items-center gap-1">✓ Escrow Protected</span>
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-blue-500"></span>
+                </span>
               </div>
             </div>
 
             {/* Widget 3: Live Hotline Help */}
-            <div className="bg-gradient-to-tr from-blue-500/10 to-purple-600/10 border border-white/5 rounded-2xl p-4 text-left flex-1 flex flex-col justify-between min-h-[110px]">
+            <div className="bg-gradient-to-tr from-blue-500/10 via-purple-605/5 to-indigo-500/15 border border-white/5 hover:border-indigo-500/20 hover:bg-neutral-900/40 rounded-2xl p-4 text-left flex-1 flex flex-col justify-between min-h-[110px] transition-all duration-300 hover:-translate-y-0.5 shadow-md shadow-indigo-500/5 group">
               <div>
-                <span className="text-[9px] font-mono tracking-wider uppercase text-blue-400 font-bold block mb-1">
-                  NEED HELP?
+                <span className="text-[9px] font-mono tracking-wider uppercase text-sky-400 font-bold block mb-1">
+                  LIVE CLIENT LINE
                 </span>
-                <h4 className="text-xs font-bold text-white mb-1">Talk to Lira Team</h4>
+                <h4 className="text-xs font-bold text-white mb-1 group-hover:text-sky-300 transition-colors">Inquire with Team</h4>
                 <p className="text-[10px] text-slate-400 leading-tight font-sans">
-                  Reach out directly to place wholesale orders.
+                  Wholesales, live stock checks & personalized discounts.
                 </p>
               </div>
               <button 
                 onClick={() => handleWhatsAppConsultation()}
-                className="w-full py-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-[10px] font-mono font-bold text-white rounded-xl hover:scale-[1.02] active:scale-95 transition-transform cursor-pointer"
+                className="w-full py-2.5 bg-gradient-to-r from-blue-500 via-indigo-550 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-[10px] font-mono font-bold text-white rounded-xl hover:scale-[1.01] active:scale-95 transition-transform cursor-pointer uppercase tracking-wider shadow-md shadow-blue-500/10"
               >
                 Inquire Hotline
               </button>

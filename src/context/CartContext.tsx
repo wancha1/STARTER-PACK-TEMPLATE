@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import { ShoppingBag, Heart, Bookmark, CheckCircle, X, Sparkles, ArrowRight } from "lucide-react";
 import { Product, CartItem } from "../types";
 import { PRODUCTS } from "../data";
@@ -547,7 +548,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   // Client-Active Notification Toast Panel
-  const [activeNotification, setActiveNotification] = useState<{
+  const [activeNotification, setActiveNotificationState] = useState<{
     product: Product;
     type: "cart" | "wishlist";
     quantity?: number;
@@ -555,14 +556,45 @@ export function CartProvider({ children }: { children: ReactNode }) {
     storage?: string;
   } | null>(null);
 
-  // Auto-dismiss handler to let alerts slide back smoothly
-  useEffect(() => {
-    if (!activeNotification) return;
-    const timer = setTimeout(() => {
-      setActiveNotification(null);
+  const [toasts, setToasts] = useState<Array<{
+    id: string;
+    product: Product;
+    type: "cart" | "wishlist";
+    quantity?: number;
+    color?: string;
+    storage?: string;
+  }>>([]);
+
+  const addToast = (
+    product: Product,
+    type: "cart" | "wishlist",
+    quantity?: number,
+    color?: string,
+    storage?: string
+  ) => {
+    const id = Math.random().toString(36).substring(2, 9);
+    setToasts((prev) => [...prev, { id, product, type, quantity, color, storage }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
     }, 4500);
-    return () => clearTimeout(timer);
-  }, [activeNotification]);
+  };
+
+  const removeToast = (id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  const setActiveNotification = (notification: any | null) => {
+    setActiveNotificationState(notification);
+    if (notification) {
+      addToast(
+        notification.product,
+        notification.type,
+        notification.quantity,
+        notification.color,
+        notification.storage
+      );
+    }
+  };
 
   // SEO state
   const [activeCategory, setActiveCategory] = useState<string>("All");
@@ -830,118 +862,124 @@ export function CartProvider({ children }: { children: ReactNode }) {
     >
       {selectedHtmlIdFix(children)}
 
-      {/* Interactive Customer Notification Popup / Brief Toast */}
-      {activeNotification && (
-        <div 
-          id="customer-notification-popup"
-          className="fixed bottom-6 right-6 z-[200] max-w-sm w-full bg-neutral-950/95 border border-white/10 rounded-3xl p-4 shadow-2xl backdrop-blur-xl pointer-events-auto select-none transition-all duration-300"
-          style={{
-            boxShadow: activeNotification.type === "cart" 
-              ? "0 20px 40px -15px rgba(16,185,129,0.2), 0 0 0 1px rgba(255,255,255,0.05)" 
-              : "0 20px 40px -15px rgba(244,63,94,0.2), 0 0 0 1px rgba(255,255,255,0.05)"
-          }}
-        >
-          {/* Background glowing gradient base */}
-          <div className={`absolute -inset-px -z-10 rounded-3xl opacity-30 blur-md transition-all ${
-            activeNotification.type === "cart" ? "bg-emerald-500/10" : "bg-pink-500/10"
-          }`} />
-
-          <div className="flex gap-3">
-            {/* Dynamic Image Wrapper with Glow */}
-            <div className="relative w-16 h-16 rounded-2xl overflow-hidden bg-neutral-900 border border-white/15 shrink-0">
-              <img 
-                src={getProductImageUrl(activeNotification.product)} 
-                className="w-full h-full object-cover transition-transform duration-500 hover:scale-110" 
-                alt="" 
-              />
-              <div className={`absolute bottom-1 right-1 w-4 h-4 rounded-full flex items-center justify-center text-[8px] border shrink-0 ${
-                activeNotification.type === "cart" 
-                  ? "bg-emerald-500 border-emerald-400 text-white" 
-                  : "bg-pink-500 border-pink-400 text-white"
-              }`}>
-                {activeNotification.type === "cart" ? "✓" : "♥"}
-              </div>
-            </div>
-
-            {/* Info Blocks */}
-            <div className="flex-1 min-w-0 flex flex-col justify-center text-left">
-              <div className="flex items-center gap-1.5 mb-1">
-                <span className={`text-[9px] font-mono font-bold tracking-widest uppercase px-2 py-0.5 rounded-md ${
-                  activeNotification.type === "cart" 
-                    ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" 
-                    : "bg-pink-500/10 text-pink-400 border border-pink-500/20"
-                }`}>
-                  {activeNotification.type === "cart" ? "⚡ Added To Cart" : "💖 Saved To Wishlist"}
-                </span>
-                <span className="w-1.5 h-1.5 rounded-full animate-pulse bg-sky-400" />
-              </div>
-              <h4 className="text-sm font-semibold text-white truncate font-display">
-                {activeNotification.product.name}
-              </h4>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <span className="text-xs font-mono font-bold text-sky-400">
-                  {new Intl.NumberFormat("en-US", {
-                    style: "currency",
-                    currency: "UGX",
-                    maximumFractionDigits: 0,
-                  }).format(activeNotification.product.price)}
-                </span>
-                {activeNotification.color && (
-                  <span className="text-[10px] text-slate-400 font-mono truncate">
-                    • {activeNotification.color}
-                  </span>
-                )}
-                {activeNotification.storage && (
-                  <span className="text-[10px] text-slate-400 font-mono truncate">
-                    • {activeNotification.storage}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Close button icon */}
-            <button
-              type="button"
-              onClick={() => setActiveNotification(null)}
-              className="h-6 w-6 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer border border-white/5 active:scale-90"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          {/* Quick Action Interactive Footer */}
-          <div className="mt-3 pt-3 border-t border-white/5 flex gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                setActiveNotification(null);
+      {/* Interactive Customer Notification Popup / Brief Toast Stack */}
+      <div className="fixed bottom-6 right-6 z-[250] flex flex-col gap-3.5 max-w-sm w-full select-none pointer-events-none">
+        <AnimatePresence mode="popLayout">
+          {toasts.map((toast) => (
+            <motion.div
+              layout
+              key={toast.id}
+              initial={{ opacity: 0, y: 30, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95, transition: { duration: 0.2 } }}
+              className="w-full bg-neutral-950/95 border border-white/10 rounded-2xl p-4 shadow-2xl backdrop-blur-xl pointer-events-auto flex flex-col relative overflow-hidden"
+              style={{
+                boxShadow: toast.type === "cart"
+                  ? "0 15px 35px -10px rgba(16,185,129,0.15), 0 0 0 1px rgba(255,255,255,0.03)"
+                  : "0 15px 35px -10px rgba(244,63,94,0.15), 0 0 0 1px rgba(255,255,255,0.03)"
               }}
-              className="flex-1 py-1.5 text-[10px] font-mono uppercase bg-neutral-900 hover:bg-neutral-850 text-slate-400 hover:text-white rounded-xl border border-white/5 transition-all cursor-pointer font-bold select-none text-center"
             >
-              Dismiss
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                if (activeNotification.type === "cart") {
-                  setIsCartOpen(true);
-                } else {
-                  setIsWishlistOpen(true);
-                }
-                setActiveNotification(null);
-              }}
-              className={`flex-1 py-1.5 px-3 text-[10px] font-mono uppercase rounded-xl transition-all cursor-pointer font-extrabold flex items-center justify-center gap-1.5 text-black ${
-                activeNotification.type === "cart"
-                  ? "bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-500 hover:to-teal-500"
-                  : "bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500"
-              }`}
-            >
-              <span>{activeNotification.type === "cart" ? "View Checkout" : "View Wishlist"}</span>
-              <ArrowRight className="w-3 h-3" />
-            </button>
-          </div>
-        </div>
-      )}
+              {/* Glow border stripe */}
+              <div className={`absolute left-0 top-0 bottom-0 w-1 ${
+                toast.type === "cart" ? "bg-emerald-500" : "bg-gradient-to-b from-rose-500 to-pink-500"
+              }`} />
+
+              <div className="flex gap-3">
+                {/* Dynamic Image Wrapper with Glow */}
+                <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-neutral-900 border border-white/10 shrink-0">
+                  <img
+                    src={getProductImageUrl(toast.product)}
+                    className="w-full h-full object-cover"
+                    alt=""
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className={`absolute bottom-0.5 right-0.5 w-3.5 h-3.5 rounded-full flex items-center justify-center text-[7px] border shrink-0 ${
+                    toast.type === "cart"
+                      ? "bg-emerald-500 border-emerald-400 text-white"
+                      : "bg-pink-500 border-pink-400 text-white"
+                  }`}>
+                    {toast.type === "cart" ? "✓" : "♥"}
+                  </div>
+                </div>
+
+                {/* Info Blocks */}
+                <div className="flex-1 min-w-0 flex flex-col justify-center text-left">
+                  <div className="flex items-center gap-1.5 mb-0.5">
+                    <span className={`text-[8px] font-mono font-bold tracking-widest uppercase px-1.5 py-0.5 rounded ${
+                      toast.type === "cart"
+                        ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/15"
+                        : "bg-pink-500/10 text-pink-400 border border-pink-500/15"
+                    }`}>
+                      {toast.type === "cart" ? "⚡ Added To Cart" : "💖 Saved To Wishlist"}
+                    </span>
+                  </div>
+                  <h4 className="text-xs font-semibold text-white truncate font-display">
+                    {toast.product.name}
+                  </h4>
+                  <div className="flex flex-wrap items-center gap-1.5 mt-0.5 text-[10px] text-slate-400">
+                    <span className="font-mono font-bold text-sky-400">
+                      {new Intl.NumberFormat("en-US", {
+                        style: "currency",
+                        currency: "UGX",
+                        maximumFractionDigits: 0,
+                      }).format(toast.product.price)}
+                    </span>
+                    {toast.color && (
+                      <span className="truncate">
+                        • {toast.color}
+                      </span>
+                    )}
+                    {toast.storage && (
+                      <span className="truncate">
+                        • {toast.storage}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Close x */}
+                <button
+                  type="button"
+                  onClick={() => removeToast(toast.id)}
+                  className="h-5 w-5 rounded-md bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer border border-white/5 active:scale-90 self-start"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
+
+              {/* Toast CTA trigger links */}
+              <div className="mt-2.5 pt-2 border-t border-white/5 flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => removeToast(toast.id)}
+                  className="flex-1 py-1 text-[8px] font-mono uppercase bg-neutral-900/65 hover:bg-neutral-900 text-slate-400 hover:text-white rounded-lg border border-white/5 transition-all cursor-pointer font-bold select-none text-center"
+                >
+                  Dismiss
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (toast.type === "cart") {
+                      setIsCartOpen(true);
+                    } else {
+                      setIsWishlistOpen(true);
+                    }
+                    removeToast(toast.id);
+                  }}
+                  className={`flex-1 py-1 px-2.5 text-[8px] font-mono uppercase rounded-lg transition-all cursor-pointer font-extrabold flex items-center justify-center gap-1 text-black ${
+                    toast.type === "cart"
+                      ? "bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-500"
+                      : "bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500"
+                  }`}
+                >
+                  <span>{toast.type === "cart" ? "View Checkout" : "View Wishlist"}</span>
+                  <ArrowRight className="w-2.5 h-2.5" />
+                </button>
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
     </CartContext.Provider>
   );
 }

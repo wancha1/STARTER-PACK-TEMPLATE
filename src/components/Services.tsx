@@ -29,7 +29,8 @@ import {
   MessageSquare,
   TrendingDown,
   Send,
-  ThumbsUp
+  ThumbsUp,
+  Eye
 } from "lucide-react";
 
 // Safe JSON parses response helper to securely intercept and neutralize HTML-fallback error pages from crashing client
@@ -755,6 +756,21 @@ Please assign a tech concierge to review stock and delivery schedules at my conv
                       {/* Ambient Gradient overlay */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
 
+                      {/* Quick View Hover Overlay */}
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center z-20 rounded-[2.2rem]">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedQuickViewProduct(product);
+                          }}
+                          className="px-4 py-2 bg-white text-black text-[10px] font-mono font-bold tracking-wider uppercase rounded-xl flex items-center gap-1.5 transition-transform duration-300 scale-90 group-hover:scale-100 hover:bg-slate-200 active:scale-95 shadow-lg shadow-black/40 cursor-pointer"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>Quick Specs</span>
+                        </button>
+                      </div>
+
                       {/* Stock indicator badge */}
                       {product.stockStatus === "Out of Stock" || (product.stockQuantity !== undefined && product.stockQuantity === 0) ? (
                         <span className="absolute bottom-4 right-4 text-[9px] font-mono tracking-widest uppercase font-semibold px-3 py-1 rounded-xl border backdrop-blur-md bg-black/60 border-rose-500/25 text-rose-450 text-rose-400 bg-rose-950/15">
@@ -893,17 +909,32 @@ Please assign a tech concierge to review stock and delivery schedules at my conv
                         <span>Notify Me</span>
                       </button>
                     ) : (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          addToCart(product);
-                          setIsCartOpen(true);
-                        }}
-                        className="w-full py-3.5 px-4 rounded-xl font-bold text-xs tracking-wider uppercase bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white border border-blue-500/25 hover:border-blue-500/40 transition-all cursor-pointer flex items-center justify-center gap-2 group-hover:scale-[1.01] shadow-md shadow-blue-500/10"
-                      >
-                        <ShoppingBag className="w-3.5 h-3.5 text-white" />
-                        <span>Add to Cart</span>
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedQuickViewProduct(product);
+                          }}
+                          className="flex-1 py-3.5 px-2.5 rounded-xl font-bold text-[11px] tracking-tight uppercase bg-white/5 hover:bg-white/10 text-slate-300 border border-white/5 hover:border-white/10 transition-all cursor-pointer flex items-center justify-center gap-1.5 active:scale-95"
+                          title="View Specifications & Choices"
+                        >
+                          <Eye className="w-3.5 h-3.5 text-slate-400" />
+                          <span>Specs</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            addToCart(product);
+                            setIsCartOpen(true);
+                          }}
+                          className="flex-1 py-3.5 px-2.5 rounded-xl font-bold text-[11px] tracking-tight uppercase bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white border border-blue-500/25 hover:border-blue-500/40 transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-md shadow-blue-500/10 active:scale-95"
+                        >
+                          <ShoppingBag className="w-3.5 h-3.5 text-white" />
+                          <span>+ Cart</span>
+                        </button>
+                      </div>
                     )}
                   </div>
 
@@ -1385,11 +1416,11 @@ Please assign a tech concierge to review stock and delivery schedules at my conv
                     <span className="text-emerald-400 font-extrabold text-sm">{formatCurrency(selectedQuickViewProduct.price)}</span>
                   </div>
                   <div className="text-[10px] text-slate-500 text-center italic mt-1 font-sans">
-                    * Click below to instantly draft order details to sales agent
+                    * Select custom colors and storage options above before completing checkout
                   </div>
                 </div>
 
-                {/* Primary WhatsApp Direct Dispatch button */}
+                {/* Primary Actions Button Row */}
                 <div className="pt-4 border-t border-white/5 flex flex-col sm:flex-row items-center gap-3">
                   {/* Like & Wishlist Quick Actions for the detailed modal */}
                   <div className="flex gap-2 self-stretch sm:self-auto justify-center">
@@ -1422,21 +1453,36 @@ Please assign a tech concierge to review stock and delivery schedules at my conv
                     </button>
                   </div>
 
+                  {/* Direct Add to Cart Trigger */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const activeColor = productSelections[selectedQuickViewProduct.id]?.color || selectedQuickViewProduct.colors?.[0];
+                      const activeStorage = productSelections[selectedQuickViewProduct.id]?.storage || selectedQuickViewProduct.storages?.[0];
+                      addToCart(selectedQuickViewProduct, 1, activeColor, activeStorage);
+                      setIsCartOpen(true);
+                      setSelectedQuickViewProduct(null);
+                    }}
+                    className="flex-1 py-4 px-6 rounded-2xl font-bold bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white transition-all cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-blue-500/15 w-full sm:w-auto hover:scale-[1.01] active:scale-[0.98]"
+                  >
+                    <ShoppingBag className="w-4.5 h-4.5 shrink-0" />
+                    <span className="text-xs uppercase tracking-wider font-extrabold">Add To Cart</span>
+                  </button>
+
                   <button
                     type="button"
                     onClick={() => {
                       handleInitiateWhatsAppCall(selectedQuickViewProduct);
                       setSelectedQuickViewProduct(null);
                     }}
-                    className="flex-1 py-4 px-6 rounded-2xl font-bold bg-[#25D366] hover:bg-[#20ba54] text-white transition-all cursor-pointer flex items-center justify-center gap-2.5 shadow-lg shadow-[#25D366]/10 w-full sm:w-auto"
+                    className="flex-1 py-4 px-6 rounded-2xl font-bold bg-[#25D366] hover:bg-[#20ba54] text-white transition-all cursor-pointer flex items-center justify-center gap-2.5 shadow-lg shadow-[#25D366]/10 w-full sm:w-auto hover:scale-[1.01] active:scale-[0.98]"
                   >
-                    <ShoppingBag className="w-4.5 h-4.5" />
-                    <span className="text-xs uppercase tracking-wider font-bold">Book Order via WhatsApp</span>
+                    <span className="text-xs uppercase tracking-wider font-bold">WhatsApp Order</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setSelectedQuickViewProduct(null)}
-                    className="py-4 px-6 rounded-2xl font-bold bg-white/5 hover:bg-white/10 text-slate-300 text-xs transition-colors cursor-pointer w-full sm:w-auto"
+                    className="py-4 px-5 rounded-2xl font-bold bg-white/5 hover:bg-white/10 text-slate-300 text-xs transition-colors cursor-pointer w-full sm:w-auto"
                   >
                     Back to Catalog
                   </button>
@@ -1450,22 +1496,37 @@ Please assign a tech concierge to review stock and delivery schedules at my conv
                 </div>
 
                 {/* Mobile Sticky CTA Trigger overlay inside viewport */}
-                <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#020205]/95 backdrop-blur-md border-t border-white/10 p-4 flex items-center justify-between xl:hidden animate-fade-in">
-                  <div className="max-w-[160px] truncate text-left">
-                    <div className="text-[8px] text-sky-400 font-mono uppercase tracking-widest leading-none mb-1">Mobile Fast checkout</div>
-                    <div className="text-sm font-mono text-white font-extrabold truncate">{selectedQuickViewProduct.name}</div>
+                <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#020205]/95 backdrop-blur-md border-t border-white/10 p-4 flex items-center justify-between xl:hidden animate-fade-in gap-3">
+                  <div className="max-w-[110px] truncate text-left shrink-0">
+                    <div className="text-[8px] text-sky-400 font-mono uppercase tracking-widest leading-none mb-1">Fast checkout</div>
+                    <div className="text-xs font-mono text-white font-extrabold truncate">{selectedQuickViewProduct.name}</div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      handleInitiateWhatsAppCall(selectedQuickViewProduct);
-                      setSelectedQuickViewProduct(null);
-                    }}
-                    className="px-5 py-3.5 rounded-xl font-bold text-white bg-[#25D366] hover:bg-[#20ba54] text-xs uppercase tracking-wider flex items-center gap-2 shadow-xl shadow-[#25D366]/20 cursor-pointer"
-                  >
-                    <ShoppingBag className="w-3.5 h-3.5" />
-                    <span>Buy Now</span>
-                  </button>
+                  <div className="flex gap-2 flex-1 justify-end">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const activeColor = productSelections[selectedQuickViewProduct.id]?.color || selectedQuickViewProduct.colors?.[0];
+                        const activeStorage = productSelections[selectedQuickViewProduct.id]?.storage || selectedQuickViewProduct.storages?.[0];
+                        addToCart(selectedQuickViewProduct, 1, activeColor, activeStorage);
+                        setIsCartOpen(true);
+                        setSelectedQuickViewProduct(null);
+                      }}
+                      className="flex-1 py-3 px-3 rounded-xl font-bold text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-[10px] uppercase tracking-wider flex items-center justify-center gap-1 shadow-lg shadow-blue-500/10 cursor-pointer text-center"
+                    >
+                      <ShoppingBag className="w-3.5 h-3.5 shrink-0" />
+                      <span>+ Cart</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleInitiateWhatsAppCall(selectedQuickViewProduct);
+                        setSelectedQuickViewProduct(null);
+                      }}
+                      className="flex-1 py-3 px-3 rounded-xl font-bold text-white bg-[#25D366] hover:bg-[#20ba54] text-[10px] uppercase tracking-wider flex items-center justify-center gap-1 shadow-xl shadow-[#25D366]/20 cursor-pointer text-center"
+                    >
+                      <span>Buy Direct</span>
+                    </button>
+                  </div>
                 </div>
 
               </div>
