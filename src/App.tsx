@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import Header from "./components/Header";
+import Hero from "./components/Hero";
 import Services from "./components/Services";
+import AppleFeatures from "./components/AppleFeatures";
 import WhyChooseUs from "./components/WhyChooseUs";
 import About from "./components/About";
 import Testimonials from "./components/Testimonials";
@@ -52,13 +54,19 @@ function SeoHelmet() {
 function MainLayout() {
   const { showMerchantAdmin } = useCart();
   return (
-    <div className="relative min-h-screen font-sans bg-[#020205] text-[#f3f4f6] antialiased overflow-x-hidden">
+    <div className="relative min-h-screen font-sans bg-[#fcfcfd] text-[#1c1c1e] antialiased overflow-x-hidden">
       {/* Dynamic Navigation Header */}
       <Header />
 
       <main className="relative">
+        {/* Solo's Client Lock-In Hero Hub */}
+        <Hero />
+
         {/* Services Showcase & Interactive Calculator */}
         <Services />
+
+        {/* Apple Luxury Experience Hub (Removed per user request) */}
+        {/* <AppleFeatures /> */}
 
         {/* Why Choose Us Trust Indicators Grid (Disabled per user request) */}
         {/* <WhyChooseUs /> */}

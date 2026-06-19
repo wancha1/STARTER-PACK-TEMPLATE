@@ -162,19 +162,19 @@ export default function SearchModal() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[200] bg-[#020205]/95 backdrop-blur-xl flex flex-col pt-24 pb-8 px-4 sm:px-6 md:px-8"
+          className="fixed inset-0 z-[200] bg-white/95 backdrop-blur-xl flex flex-col pt-24 pb-8 px-4 sm:px-6 md:px-8 text-left"
         >
           {/* Inner content wrapper */}
           <div className="w-full max-w-3xl mx-auto flex flex-col h-full">
             {/* Input & Close block */}
-            <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
+            <div className="flex items-center justify-between border-b border-gray-200 pb-4 mb-6">
               <div className="flex items-center gap-3.5 flex-1 select-none">
                 {isSearching ? (
                   <div className="w-6 h-6 flex items-center justify-center shrink-0">
-                    <div className="w-4.5 h-4.5 border-2 border-slate-500/30 border-t-blue-500 rounded-full animate-spin" />
+                    <div className="w-4.5 h-4.5 border-2 border-slate-300 border-t-blue-650 border-t-blue-600 rounded-full animate-spin" />
                   </div>
                 ) : (
-                  <Search className="w-6 h-6 text-slate-400 shrink-0" />
+                  <Search className="w-6 h-6 text-slate-405 text-slate-400 shrink-0" />
                 )}
                 
                 <input
@@ -183,14 +183,14 @@ export default function SearchModal() {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Sealed iPhone 15, HP laptop, OLED screen, storage options..."
-                  className="w-full bg-transparent text-white font-display text-lg md:text-xl placeholder-slate-500 outline-none border-none py-1"
+                  className="w-full bg-transparent text-slate-900 font-display text-lg md:text-xl placeholder-slate-400 outline-none border-none py-1 lg:py-2"
                 />
               </div>
 
               <button
                 type="button"
                 onClick={() => setIsSearchOpen(false)}
-                className="p-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all cursor-pointer bg-white/2"
+                className="p-2.5 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-gray-100 transition-all cursor-pointer bg-gray-50"
                 aria-label="Close global search"
               >
                 <X className="w-5 h-5" />
@@ -203,7 +203,7 @@ export default function SearchModal() {
                 // Pre-Search Suggestion Guide
                 <div className="space-y-8 py-4 text-left">
                   <div>
-                    <span className="text-[10px] uppercase font-mono tracking-widest text-blue-400 font-bold block mb-4">
+                    <span className="text-[10px] uppercase font-mono tracking-widest text-blue-650 text-blue-600 font-bold block mb-4">
                       Instant Premium Categories
                     </span>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -215,9 +215,9 @@ export default function SearchModal() {
                             setQuery(cat);
                             inputRef.current?.focus();
                           }}
-                          className="px-4 py-3 rounded-xl border border-white/5 bg-white/3 hover:bg-white/8 hover:border-white/15 text-slate-300 font-medium text-xs text-left cursor-pointer transition-all animate-fade-in"
+                          className="px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100 hover:border-gray-300 text-slate-700 font-medium text-xs text-left cursor-pointer transition-all animate-fade-in"
                         >
-                          <div className="font-semibold text-white">{cat}</div>
+                          <div className="font-semibold text-slate-900">{cat}</div>
                           <span className="text-[9px] font-mono text-slate-500">Quick explore</span>
                         </button>
                       ))}
@@ -225,7 +225,7 @@ export default function SearchModal() {
                   </div>
 
                   <div>
-                    <span className="text-[10px] uppercase font-mono tracking-widest text-[#25D366] font-bold block mb-3">
+                    <span className="text-[10px] uppercase font-mono tracking-widest text-[#25D366] font-extrabold block mb-3">
                       Recommended Store Queries
                     </span>
                     <div className="flex flex-wrap gap-2">
@@ -237,7 +237,7 @@ export default function SearchModal() {
                             setQuery(rec);
                             inputRef.current?.focus();
                           }}
-                          className="px-3.5 py-1.5 rounded-lg border border-white/5 bg-black/40 hover:bg-white/5 text-slate-400 text-xs cursor-pointer transition-colors"
+                          className="px-3.5 py-1.5 rounded-lg border border-gray-200 bg-gray-50 hover:bg-gray-100 text-slate-600 text-xs cursor-pointer transition-colors"
                         >
                           {rec}
                         </button>
@@ -245,25 +245,25 @@ export default function SearchModal() {
                     </div>
                   </div>
 
-                  <div className="bg-white/2 border border-white/5 p-5 rounded-2xl">
+                  <div className="bg-gray-50 border border-gray-200 p-5 rounded-2xl">
                     <span className="text-[9px] font-mono uppercase text-slate-500 font-bold block mb-1">
                       AUTHORIZED FLAGSHIP OUTLET CONCIERGE DIRECTIVES:
                     </span>
-                    <p className="text-xs text-slate-400 font-light leading-relaxed font-sans">
+                    <p className="text-xs text-slate-600 font-light leading-relaxed font-sans">
                       Start typing components, model numbers, or core specs to instantly crawl authentic, sealed stock registered on Juba Road. Simply configure variables on the search result card to pre-fetch doorstep dispatch tags!
                     </p>
                   </div>
                 </div>
               ) : results.length === 0 && !isSearching ? (
                 // No Matching Results
-                <div className="py-16 text-center max-w-md mx-auto animate-fade-in">
-                  <div className="w-14 h-14 rounded-2xl bg-white/3 text-slate-400 flex items-center justify-center text-lg mb-4 mx-auto">
+                <div className="py-16 text-center max-w-md mx-auto animate-fade-in text-center">
+                  <div className="w-14 h-14 rounded-2xl bg-gray-50 border border-gray-200 text-slate-600 flex items-center justify-center text-lg mb-4 mx-auto">
                     🔍
                   </div>
-                  <h5 className="font-display font-semibold text-white tracking-tight text-base mb-1">
+                  <h5 className="font-display font-semibold text-slate-900 tracking-tight text-base mb-1">
                     No results found for "{query}"
                   </h5>
-                  <p className="text-xs text-slate-400 font-light leading-relaxed font-sans mb-6">
+                  <p className="text-xs text-slate-600 font-light leading-relaxed font-sans mb-6">
                     We couldn't locate any items matching your exact query. Try refining your spelling or contact our Juba Road team to check off-catalog custom orders of genuine devices.
                   </p>
 
@@ -273,7 +273,7 @@ export default function SearchModal() {
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider bg-[#25D366] hover:bg-[#20ba54] text-white transition-all shadow-lg shadow-[#25D366]/10 hover:shadow-[#25D366]/20 cursor-pointer"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider bg-[#25D366] hover:bg-[#20ba54] text-white transition-all shadow-md cursor-pointer"
                   >
                     <span>Inquire on WhatsApp Hotline</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -297,13 +297,13 @@ export default function SearchModal() {
                             onClick={() => handleSelectProduct(product)}
                             className={`group flex items-center justify-between gap-4 p-3 border rounded-2xl transition-all duration-200 cursor-pointer text-left ${
                               isHighlighted
-                                ? "bg-white/10 border-blue-500/50 shadow-md translate-x-1"
-                                : "bg-neutral-900/40 hover:bg-white/5 border-white/5 hover:border-white/10"
+                                ? "bg-blue-50/50 border-blue-500 shadow-sm translate-x-1"
+                                : "bg-white hover:bg-gray-50 border-gray-150 hover:border-gray-200"
                             }`}
                           >
                             {/* Thumbnail and Title details block */}
                             <div className="flex items-center gap-4 min-w-0 flex-1">
-                              <div className="w-14 h-14 bg-black rounded-xl overflow-hidden shrink-0 border border-white/10 flex items-center justify-center">
+                              <div className="w-14 h-14 bg-gray-50 rounded-xl overflow-hidden shrink-0 border border-gray-200 flex items-center justify-center">
                                 <img
                                   src={getSearchProductImageUrl(product)}
                                   alt={product.name}
@@ -316,7 +316,7 @@ export default function SearchModal() {
                                 <span className="text-[9px] font-mono tracking-wider uppercase text-slate-500 block">
                                   {product.category}
                                 </span>
-                                <h4 className="text-sm font-semibold text-white group-hover:text-blue-400 font-display transition-colors truncate">
+                                <h4 className="text-sm font-semibold text-slate-900 group-hover:text-blue-600 font-display transition-colors truncate">
                                   {product.name}
                                 </h4>
                                 <p className="text-[10px] font-mono text-slate-400 truncate mt-0.5">

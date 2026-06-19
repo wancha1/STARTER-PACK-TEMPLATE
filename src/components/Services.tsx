@@ -529,28 +529,28 @@ Please assign a tech concierge to review stock and delivery schedules at my conv
   };
 
   return (
-    <section id="services" className="py-24 sm:py-32 relative bg-[#020205] overflow-hidden">
+    <section id="services" className="py-24 sm:py-32 relative bg-[#fcfcfd] overflow-hidden">
       {/* Immersive background aura highlights */}
-      <div className="absolute top-0 left-1/4 w-[50%] h-[40%] bg-blue-600/5 rounded-full blur-[160px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-[40%] h-[30%] bg-purple-600/5 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute top-0 left-1/4 w-[50%] h-[40%] bg-blue-500/3 rounded-full blur-[160px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-[40%] h-[30%] bg-purple-500/3 rounded-full blur-[140px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
         
         {/* Jumia-style vibrant marketplace Header */}
         <div className="text-center max-w-4xl mx-auto mb-16 md:mb-24">
-          <span className="text-[11px] font-mono uppercase tracking-[0.25em] text-blue-400 font-bold mb-3 inline-block">
+          <span className="text-[11px] font-mono uppercase tracking-[0.25em] text-blue-600 font-bold mb-3 inline-block">
             ⚡ APEX DAILY SUPER DEALS
           </span>
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-display font-extrabold text-white tracking-tight mb-5">
-            Lira's Premium <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Tech Store</span>
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-display font-extrabold text-slate-900 tracking-tight mb-5">
+            Lira's Premium <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Tech Store</span>
           </h2>
-          <p className="text-slate-400 text-sm sm:text-base md:text-lg font-light leading-relaxed max-w-2xl mx-auto font-sans">
+          <p className="text-slate-600 text-sm sm:text-base md:text-lg font-light leading-relaxed max-w-2xl mx-auto font-sans">
             Shop the best discounts on Uganda's most popular gadgets. Complete with official brand warranties, instant mobile money escrow, and secure same-day doorstep delivery. No slow catalogs, just express value!
           </p>
         </div>
 
         {/* E-Commerce Understated Minimal Filters & Tabs */}
-        <div className="bg-neutral-950/40 border border-white/5 p-6 rounded-[2.5rem] gap-6 mb-16 flex flex-col backdrop-blur-xl">
+        <div className="bg-white border border-gray-200/80 p-6 rounded-[2.5rem] gap-6 mb-16 flex flex-col backdrop-blur-xl shadow-sm">
           <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-6">
             
             {/* Elegant categories list scroll */}
@@ -562,8 +562,8 @@ Please assign a tech concierge to review stock and delivery schedules at my conv
                   onClick={() => setActiveCategory(cat)}
                   className={`px-5 py-2.5 text-xs font-semibold rounded-xl text-center shrink-0 snap-start cursor-pointer transition-all duration-300 ${
                     activeCategory === cat
-                      ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold shadow-lg shadow-blue-500/25"
-                      : "bg-white/3 hover:bg-white/8 border border-white/5 text-slate-300"
+                      ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold shadow-lg shadow-blue-500/25"
+                      : "bg-gray-100 hover:bg-gray-150 border border-gray-200 text-slate-700"
                   }`}
                 >
                   {cat}
@@ -574,7 +574,7 @@ Please assign a tech concierge to review stock and delivery schedules at my conv
             {/* Quiet modern query bars */}
             <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center flex-1 lg:max-w-xl md:justify-end">
               <div className="relative flex-1">
-                <span className="absolute inset-y-0 left-3.5 flex items-center text-blue-400">
+                <span className="absolute inset-y-0 left-3.5 flex items-center text-blue-500">
                   <Search className="w-4 h-4" />
                 </span>
                 <input
@@ -582,7 +582,7 @@ Please assign a tech concierge to review stock and delivery schedules at my conv
                   placeholder="Search products, category deals or brands..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full bg-black/50 border border-white/10 text-xs rounded-xl pl-10 pr-4 py-3 text-white outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-sans"
+                  className="w-full bg-white border border-gray-300 text-xs rounded-xl pl-10 pr-4 py-3 text-slate-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-sans"
                 />
               </div>
 
@@ -592,7 +592,7 @@ Please assign a tech concierge to review stock and delivery schedules at my conv
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="bg-black/50 border border-white/10 text-xs rounded-xl px-3 py-3 text-white outline-none cursor-pointer focus:border-blue-500 transition-all font-sans"
+                  className="bg-white border border-gray-300 text-xs rounded-xl px-3 py-3 text-slate-800 outline-none cursor-pointer focus:border-blue-500 transition-all font-sans"
                 >
                   <option value="featured">Best Matches</option>
                   <option value="price_asc">Price: Lowest first</option>
@@ -604,9 +604,9 @@ Please assign a tech concierge to review stock and delivery schedules at my conv
           </div>
 
           {/* Clean range slider budget checks */}
-          <div className="border-t border-white/5 pt-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-left">
-            <div className="flex items-center gap-2 text-slate-400 text-xs w-full sm:w-auto">
-              <SlidersHorizontal className="w-4 h-4 text-sky-400 shrink-0" />
+          <div className="border-t border-gray-200 pt-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-left">
+            <div className="flex items-center gap-2 text-slate-600 text-xs w-full sm:w-auto">
+              <SlidersHorizontal className="w-4 h-4 text-blue-500 shrink-0" />
               <span className="font-mono text-[9px] uppercase font-bold tracking-widest text-slate-500">Target budget limit:</span>
             </div>
 
@@ -618,9 +618,9 @@ Please assign a tech concierge to review stock and delivery schedules at my conv
                 step="5000"
                 value={maxPriceLimit}
                 onChange={(e) => setMaxPriceLimit(Number(e.target.value))}
-                className="flex-1 accent-white bg-white/5 h-1 rounded-lg cursor-pointer"
+                className="flex-1 accent-blue-600 bg-gray-200 h-1.5 rounded-lg cursor-pointer"
               />
-              <div className="flex items-center gap-1.5 bg-neutral-900/90 border border-white/10 hover:border-white/20 px-3 py-1.5 rounded-xl shrink-0 font-mono text-xs text-white transition-colors">
+              <div className="flex items-center gap-1.5 bg-white border border-gray-300 hover:border-gray-400 px-3 py-1.5 rounded-xl shrink-0 font-mono text-xs text-slate-800 transition-colors">
                 <span className="text-slate-500 text-[9px] font-bold uppercase tracking-wider shrink-0">Limit: UGX</span>
                 <input
                   type="text"
@@ -639,7 +639,7 @@ Please assign a tech concierge to review stock and delivery schedules at my conv
                       setMaxPriceLimit(5000);
                     }
                   }}
-                  className="w-24 bg-transparent border-none text-white font-mono text-xs font-bold focus:outline-none focus:ring-0 text-right p-0"
+                  className="w-24 bg-transparent border-none text-slate-800 font-mono text-xs font-bold focus:outline-none focus:ring-0 text-right p-0"
                   placeholder="5,000"
                   title="Type your target budget limit"
                   id="typed-budget-limit-input"
@@ -665,24 +665,24 @@ Please assign a tech concierge to review stock and delivery schedules at my conv
             Array.from({ length: 3 }).map((_, idx) => (
               <div
                 key={`lux-skeleton-${idx}`}
-                className="bg-white/3 border border-white/5 rounded-[2.5rem] p-6 flex flex-col justify-between relative text-left overflow-hidden min-h-[500px]"
+                className="bg-white border border-gray-200 rounded-[2.5rem] p-6 flex flex-col justify-between relative text-left overflow-hidden min-h-[500px]"
               >
-                <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/[0.03] to-transparent animate-shimmer pointer-events-none" />
+                <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-gray-100 to-transparent animate-shimmer pointer-events-none" />
                 <div>
-                  <div className="w-full aspect-[4/3] rounded-2xl bg-white/5 mb-6 animate-pulse" />
-                  <div className="h-4 bg-white/5 rounded w-1/3 mb-4 animate-pulse" />
-                  <div className="h-6 bg-white/5 rounded w-3/4 mb-4 animate-pulse" />
+                  <div className="w-full aspect-[4/3] rounded-2xl bg-gray-100 mb-6 animate-pulse" />
+                  <div className="h-4 bg-gray-100 rounded w-1/3 mb-4 animate-pulse" />
+                  <div className="h-6 bg-gray-100 rounded w-3/4 mb-4 animate-pulse" />
                 </div>
-                <div className="h-12 bg-white/5 rounded-2xl animate-pulse" />
+                <div className="h-12 bg-gray-100 rounded-2xl animate-pulse" />
               </div>
             ))
           ) : filteredProducts.length === 0 ? (
-            <div className="col-span-1 md:col-span-2 lg:col-span-3 bg-neutral-950/40 border border-white/5 rounded-[2.5rem] p-16 text-center max-w-xl mx-auto">
-              <div className="w-16 h-16 rounded-2xl bg-white/5 text-slate-400 flex items-center justify-center mb-5 mx-auto text-xl">
+            <div className="col-span-1 md:col-span-2 lg:col-span-3 bg-white border border-gray-200 rounded-[2.5rem] p-16 text-center max-w-xl mx-auto shadow-sm">
+              <div className="w-16 h-16 rounded-2xl bg-gray-50 text-slate-400 flex items-center justify-center mb-5 mx-auto text-xl border border-gray-100">
                 ☕
               </div>
-              <h5 className="font-display font-medium text-lg text-white mb-2">No matching items</h5>
-              <p className="text-sm text-slate-400 font-light leading-relaxed max-w-sm mx-auto">
+              <h5 className="font-display font-medium text-lg text-slate-900 mb-2">No matching items</h5>
+              <p className="text-sm text-slate-500 font-light leading-relaxed max-w-sm mx-auto">
                 No active stock matched "{searchTerm}" or fits this specific price bracket. Reach our Juba Road team using WhatsApp to import or customize custom electronic specs!
               </p>
             </div>
@@ -693,17 +693,17 @@ Please assign a tech concierge to review stock and delivery schedules at my conv
               // Stable scarcity & buyer psychology tag calculation
               const getUrgencyContext = (id: string, idx: number) => {
                 const map: Record<string, { label: string; style: string }> = {
-                  "iphone-15 Pro Max": { label: "🔥 Only 2 sealed boxes left!", style: "text-amber-400 bg-amber-500/10 border-amber-500/20" },
-                  "galaxy-s24-ultra": { label: "📈 Selling fast in Lira this week", style: "text-blue-400 bg-blue-500/10 border-blue-500/20" },
-                  "macbook-pro-m3": { label: "⚡ Free dispatch to Lira/Gulu today", style: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
-                  "sony-ps5-slim": { label: "⏳ Low Stock Count", style: "text-rose-400 bg-rose-500/10 border-rose-500/20" },
+                  "iphone-15 Pro Max": { label: "🔥 Only 2 sealed boxes left!", style: "text-amber-700 bg-amber-50 border-amber-250/60" },
+                  "galaxy-s24-ultra": { label: "📈 Selling fast in Lira this week", style: "text-blue-700 bg-blue-50 border-blue-200" },
+                  "macbook-pro-m3": { label: "⚡ Free dispatch to Lira/Gulu today", style: "text-emerald-700 bg-emerald-50 border-emerald-200" },
+                  "sony-ps5-slim": { label: "⏳ Low Stock Count", style: "text-rose-700 bg-rose-50 border-rose-200" },
                 };
                 
                 // fallback rotating logic
                 const defaults = [
-                  { label: "🛡️ 1-Year Local Warranty", style: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20" },
-                  { label: "📦 Sealed Original Accessories", style: "text-purple-400 bg-purple-500/10 border-purple-500/20" },
-                  { label: "✨ Pristine High-Spec Grade", style: "text-teal-400 bg-teal-500/10 border-teal-500/20" }
+                  { label: "🛡️ 1-Year Local Warranty", style: "text-indigo-700 bg-indigo-50 border-indigo-200" },
+                  { label: "📦 Sealed Original Accessories", style: "text-purple-700 bg-purple-50 border-purple-200" },
+                  { label: "✨ Pristine High-Spec Grade", style: "text-teal-700 bg-teal-50 border-teal-200" }
                 ];
                 
                 return map[id] || defaults[idx % defaults.length];
@@ -717,16 +717,16 @@ Please assign a tech concierge to review stock and delivery schedules at my conv
                   onMouseEnter={() => setHoveredProductId(product.id)}
                   onMouseLeave={() => setHoveredProductId(null)}
                   onClick={() => setSelectedQuickViewProduct(product)}
-                  className="product-catalog-grid-item group flex flex-col justify-between text-left relative transition-all duration-300 cursor-pointer"
+                  className="product-catalog-grid-item group flex flex-col justify-between text-left relative transition-all duration-300 cursor-pointer bg-white border border-gray-200 shadow-sm hover:shadow-md hover:border-gray-300 rounded-[2.5rem] p-5"
                 >
                   <div className="relative">
                     {/* Frame image (High-resolution premium photography) */}
-                    <div className="w-full aspect-[4/3] rounded-[2.2rem] relative overflow-hidden bg-white/3 border border-white/5 flex items-center justify-center mb-6 transition-all duration-500 group-hover:border-white/10 group-hover:shadow-[0_25px_60px_-15px_rgba(59,130,246,0.06)]">
+                    <div className="w-full aspect-[4/3] rounded-[2.2rem] relative overflow-hidden bg-gray-50 border border-gray-100 flex items-center justify-center mb-6 transition-all duration-500 group-hover:border-gray-200 group-hover:shadow-[0_25px_60px_-15px_rgba(59,130,246,0.06)]">
                       
                       {/* Skeletal Shimmer Loader */}
                       {!isImageLoaded && (
-                        <div className="absolute inset-0 bg-neutral-900 flex items-center justify-center animate-pulse z-0">
-                          <div className="absolute inset-x-0 top-0 bottom-0 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent animate-shimmer" />
+                        <div className="absolute inset-0 bg-gray-100 flex items-center justify-center animate-pulse z-0">
+                          <div className="absolute inset-x-0 top-0 bottom-0 bg-gradient-to-r from-transparent via-gray-200 to-transparent animate-shimmer" />
                         </div>
                       )}
 
@@ -805,8 +805,8 @@ Please assign a tech concierge to review stock and delivery schedules at my conv
                           }}
                           className={`w-8.5 h-8.5 rounded-full flex items-center justify-center border backdrop-blur-md active:scale-90 transition-all cursor-pointer ${
                             isLiked(product.id)
-                              ? "bg-rose-500/25 border-rose-500/40 text-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.15)] bg-slate-900/40"
-                              : "bg-black/50 border-white/5 text-white/80 hover:text-white hover:bg-black/75 hover:border-white/20"
+                              ? "bg-rose-50 border-rose-200 text-rose-500 shadow-sm"
+                              : "bg-white/90 border-gray-200 text-slate-700 hover:text-slate-950 hover:bg-white"
                           }`}
                           title={isLiked(product.id) ? "Unlike item" : "Like item"}
                         >
@@ -822,8 +822,8 @@ Please assign a tech concierge to review stock and delivery schedules at my conv
                           }}
                           className={`w-8.5 h-8.5 rounded-full flex items-center justify-center border backdrop-blur-md active:scale-90 transition-all cursor-pointer ${
                             isInWishlist(product.id)
-                              ? "bg-pink-500/15 border-pink-500/30 text-pink-400 shadow-[0_0_15px_rgba(244,63,94,0.1)] bg-slate-900/40"
-                              : "bg-black/50 border-white/5 text-white/80 hover:text-white hover:bg-black/75 hover:border-white/20"
+                              ? "bg-pink-50 border-pink-200 text-pink-500 shadow-sm"
+                              : "bg-white/90 border-gray-200 text-slate-700 hover:text-slate-950 hover:bg-white"
                           }`}
                           title={isInWishlist(product.id) ? "Remove from wishlist" : "Add to wishlist"}
                         >
@@ -839,12 +839,12 @@ Please assign a tech concierge to review stock and delivery schedules at my conv
                           }}
                           className={`w-8.5 h-8.5 rounded-full flex items-center justify-center border backdrop-blur-md active:scale-90 transition-all cursor-pointer ${
                             isInCompare(product.id)
-                              ? "bg-blue-500/25 border-blue-500/40 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.15)] bg-slate-900/40"
-                              : "bg-black/50 border-white/5 text-white/80 hover:text-white hover:bg-black/75 hover:border-white/20"
+                              ? "bg-blue-50 border-blue-200 text-blue-600 shadow-sm"
+                              : "bg-white/90 border-gray-200 text-slate-700 hover:text-slate-950 hover:bg-white"
                           }`}
                           title={isInCompare(product.id) ? "Remove from Compare" : "Compare details side-by-side"}
                         >
-                          <GitCompare className={`w-3.5 h-3.5 transition-transform duration-300 ${isInCompare(product.id) ? "rotate-180 scale-110 text-blue-400" : ""}`} />
+                          <GitCompare className={`w-3.5 h-3.5 transition-transform duration-300 ${isInCompare(product.id) ? "rotate-180 scale-110 text-blue-500" : ""}`} />
                         </button>
                       </div>
                     </div>
@@ -852,19 +852,19 @@ Please assign a tech concierge to review stock and delivery schedules at my conv
                     {/* Meta info & Titles */}
                     <div className="space-y-1 mb-2.5 text-left">
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-[10px] font-mono tracking-widest text-blue-400 uppercase font-bold">
+                        <span className="text-[10px] font-mono tracking-widest text-blue-600 uppercase font-bold">
                           {product.category}
                         </span>
                         {/* Jumia star review tag */}
                         <div className="flex items-center gap-1 font-mono text-[9px]">
-                          <span className="text-amber-400 font-bold">★</span>
-                          <span className="text-slate-300 font-medium">{product.rating} ({product.reviewsCount || 45})</span>
+                          <span className="text-amber-500 font-bold">★</span>
+                          <span className="text-slate-600 font-medium">{product.rating} ({product.reviewsCount || 45})</span>
                         </div>
                       </div>
                       
                       <h4 
                         onClick={() => setSelectedQuickViewProduct(product)}
-                        className="font-display font-bold text-lg text-white hover:text-blue-400 cursor-pointer transition-colors duration-300"
+                        className="font-display font-bold text-lg text-slate-900 hover:text-blue-600 cursor-pointer transition-colors duration-300"
                       >
                         {product.name}
                       </h4>
@@ -878,7 +878,7 @@ Please assign a tech concierge to review stock and delivery schedules at my conv
                     </div>
 
                     {/* Feature highlight line - Understated & Minimalist */}
-                    <p className="text-xs font-mono text-slate-400/80 mb-5 leading-relaxed tracking-tight text-left">
+                    <p className="text-xs font-mono text-slate-500 mb-5 leading-relaxed tracking-tight text-left">
                       {product.specs.slice(0, 2).join("    ·    ")}
                     </p>
                   </div>
@@ -886,11 +886,11 @@ Please assign a tech concierge to review stock and delivery schedules at my conv
                   {/* Pricing Matrix & Call-to-Action Layout */}
                   <div className="mt-auto space-y-4">
                     <div className="flex items-baseline justify-between gap-2">
-                      <span className="font-mono text-base font-bold text-white flex items-center gap-1">
-                        <span className="text-xs text-blue-400">UGX</span> {formatCurrency(product.price).replace("UGX", "").trim() || formatCurrency(product.price)}
+                      <span className="font-mono text-base font-bold text-slate-900 flex items-center gap-1">
+                        <span className="text-xs text-blue-600">UGX</span> {formatCurrency(product.price).replace("UGX", "").trim() || formatCurrency(product.price)}
                       </span>
                       {product.originalPrice && (
-                        <span className="font-mono text-xs text-slate-500 line-through">
+                        <span className="font-mono text-xs text-slate-400 line-through">
                           {formatCurrency(product.originalPrice)}
                         </span>
                       )}
@@ -916,10 +916,10 @@ Please assign a tech concierge to review stock and delivery schedules at my conv
                             e.stopPropagation();
                             setSelectedQuickViewProduct(product);
                           }}
-                          className="flex-1 py-3.5 px-2.5 rounded-xl font-bold text-[11px] tracking-tight uppercase bg-white/5 hover:bg-white/10 text-slate-300 border border-white/5 hover:border-white/10 transition-all cursor-pointer flex items-center justify-center gap-1.5 active:scale-95"
+                          className="flex-1 py-3.5 px-2.5 rounded-xl font-bold text-[11px] tracking-tight uppercase bg-gray-100 hover:bg-gray-200 text-slate-700 border border-transparent transition-all cursor-pointer flex items-center justify-center gap-1.5 active:scale-95"
                           title="View Specifications & Choices"
                         >
-                          <Eye className="w-3.5 h-3.5 text-slate-400" />
+                          <Eye className="w-3.5 h-3.5 text-slate-500" />
                           <span>Specs</span>
                         </button>
                         <button
@@ -929,7 +929,7 @@ Please assign a tech concierge to review stock and delivery schedules at my conv
                             addToCart(product);
                             setIsCartOpen(true);
                           }}
-                          className="flex-1 py-3.5 px-2.5 rounded-xl font-bold text-[11px] tracking-tight uppercase bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white border border-blue-500/25 hover:border-blue-500/40 transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-md shadow-blue-500/10 active:scale-95"
+                          className="flex-1 py-3.5 px-2.5 rounded-xl font-bold text-[11px] tracking-tight uppercase bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border border-blue-600/25 transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-md shadow-blue-500/10 active:scale-95"
                         >
                           <ShoppingBag className="w-3.5 h-3.5 text-white" />
                           <span>+ Cart</span>
@@ -951,11 +951,11 @@ Please assign a tech concierge to review stock and delivery schedules at my conv
               type="button"
               disabled={isLazyLoadingMore}
               onClick={handleLoadMore}
-              className="px-8 py-4 rounded-[1.5rem] bg-white/5 border border-white/10 hover:border-white/20 text-white font-medium text-xs font-mono uppercase tracking-widest transition-all cursor-pointer hover:bg-white/10 active:scale-95 disabled:opacity-50"
+              className="px-8 py-4 rounded-[1.5rem] bg-white border border-gray-300 hover:border-gray-400 text-slate-800 font-medium text-xs font-mono uppercase tracking-widest transition-all cursor-pointer hover:bg-gray-50 active:scale-95 disabled:opacity-50"
             >
               {isLazyLoadingMore ? (
                 <span className="flex items-center gap-2">
-                  <span className="w-3.5 h-3.5 rounded-full border border-white border-t-transparent animate-spin inline-block mr-1" />
+                  <span className="w-3.5 h-3.5 rounded-full border border-slate-800 border-t-transparent animate-spin inline-block mr-1" />
                   Scanning Lira Stock...
                 </span>
               ) : (

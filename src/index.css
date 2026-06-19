@@ -34,24 +34,24 @@
 }
 
 @utility bg-grid-white {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
 @utility glass-panel {
-  background-color: rgba(255, 255, 255, 0.04);
+  background-color: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 @utility glass-panel-hover {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   
   &:hover {
-    background-color: rgba(255, 255, 255, 0.09);
-    border-color: rgba(255, 255, 255, 0.16);
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    background-color: rgba(255, 255, 255, 0.95);
+    border-color: rgba(0, 0, 0, 0.12);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
   }
 }
@@ -61,8 +61,8 @@ html {
 }
 
 body {
-  background-color: #020205;
-  color: #f1f5f9;
+  background-color: #fcfcfd;
+  color: #1c1c1e;
   font-family: var(--font-sans);
   overflow-x: hidden;
 }
@@ -72,14 +72,14 @@ body {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #020205;
+  background: #f4f4f5;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.15);
   border-radius: 9999px;
-  border: 2px solid #020205;
+  border: 2px solid #f4f4f5;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.3);
 }
 

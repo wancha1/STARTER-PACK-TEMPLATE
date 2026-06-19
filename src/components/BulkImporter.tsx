@@ -3268,11 +3268,67 @@ export default function BulkImporter() {
                 {/* TAB CONTENT: 4. CLINICAL SETUP SQL MANUAL */}
                 {activeTab === "setup" && (
                   <div className="space-y-6">
+                    {/* Supabase Connection Status Panel */}
+                    <div className={`p-6 rounded-2xl border text-left flex flex-col md:flex-row items-start md:items-center justify-between gap-4 font-sans ${
+                      isSupabaseActive
+                        ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-900"
+                        : "bg-blue-500/5 border-blue-500/20 text-slate-900"
+                    }`}>
+                      <div className="space-y-1 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className={`w-2.5 h-2.5 rounded-full ${isSupabaseActive ? "bg-emerald-500 animate-pulse" : "bg-blue-500"}`} />
+                          <h6 className="font-bold text-sm tracking-tight text-slate-900">
+                            {isSupabaseActive ? "Supabase Integration Status: CONNECTED" : "Supabase Integration Status: SANDBOX MODE"}
+                          </h6>
+                        </div>
+                        <p className="text-xs text-slate-500 max-w-2xl leading-relaxed">
+                          {isSupabaseActive
+                            ? "Excellent! Your storefront is fully connected to live Supabase database tables. Products, images, and inventory configurations sync dynamically with zero-delay fallback."
+                            : "Standard local sandbox mode is currently active. Any custom changes are persisted locally inside your browser storage. Follow the checklist below to link your live Supabase database seamlessly!"
+                          }
+                        </p>
+                      </div>
+                      
+                      {!isSupabaseActive && (
+                        <div className="text-xs font-mono font-bold bg-blue-100 text-blue-800 px-3 py-1.5 rounded-lg shrink-0">
+                          🔌 Sandbox Offlinepersistence active
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Step-by-Step Supabase Connection Instructions */}
+                    <div className="bg-slate-50 border border-gray-200 rounded-2xl p-6 text-left space-y-4 font-sans">
+                      <h6 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                        <Settings className="w-4 h-4 text-blue-600" />
+                        Step-by-Step Supabase Linking Instructions
+                      </h6>
+                      
+                      <ol className="text-xs text-slate-600 space-y-3 list-decimal pl-4 leading-relaxed">
+                        <li>
+                          <strong className="text-slate-900">Access Secrets Menu</strong>: Make sure to navigate to the secrets/settings gear in your development workbench console.
+                        </li>
+                        <li>
+                          <strong className="text-slate-900">Configure Secret Environment Keys</strong>: Provide the values for the following variables:
+                          <ul className="list-disc pl-5 mt-1.5 space-y-1 font-mono text-[11px] text-slate-500">
+                            <li><span className="text-blue-600 font-bold">VITE_SUPABASE_URL</span>: Your public Supabase Project URL (<code className="bg-gray-150 px-1 py-0.5 rounded">https://xxxx.supabase.co</code>)</li>
+                            <li><span className="text-blue-600 font-bold">VITE_SUPABASE_ANON_KEY</span>: Your public <code className="bg-gray-150 px-1.5 py-0.5 rounded text-slate-700 font-semibold">anon</code> key</li>
+                            <li><span className="text-blue-600 font-bold">SUPABASE_SERVICE_ROLE_KEY</span>: Your private <code className="bg-gray-150 px-1.5 py-0.5 rounded text-red-500 font-semibold">service_role</code> key (required for cloud endpoints to sync/add items securely)</li>
+                          </ul>
+                        </li>
+                        <li>
+                          <strong className="text-slate-900">Execute SQL Bootstrap Code</strong>: Copy and paste the database schema creation SQL script provided below into your Supabase <strong className="text-slate-800 font-semibold">SQL Editor</strong>, then press run.
+                        </li>
+                        <li>
+                          <strong className="text-slate-900">Configure Media Bucket</strong>: Navigate to the <strong className="text-slate-800 font-semibold">Storage</strong> tab in Supabase, create a new public bucket named <code className="font-mono text-blue-600 bg-gray-150 px-1 py-0.5 rounded">product-media</code>, and toggle public-read access to enable image uploads.
+                        </li>
+                      </ol>
+                    </div>
+
                     <div>
-                      <h5 className="text-xs font-mono font-black text-emerald-400 uppercase tracking-widest flex items-center gap-1.5">
+                      <h5 className="text-xs font-mono font-black text-emerald-600 uppercase tracking-widest flex items-center gap-1.5">
                         <Database className="w-4 h-4" /> Supabase RLS policies and table creations CLI instructions
                       </h5>
-                      <p className="text-[10px] text-slate-400 font-light mt-1 font-sans">
+                      <p className="text-[10px] text-slate-500 font-light mt-1 font-sans">
                         To enable multi-user sync and Row Level Security, copy-paste the SQL script inside the Supabase Queries sandbox terminal of your application.
                       </p>
                     </div>
