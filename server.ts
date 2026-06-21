@@ -1064,13 +1064,20 @@ app.delete('/api/admin/reviews/:id', adminAuthMiddleware, (req, res) => {
 
 // Vite & Static file serving setup
 async function startServer() {
-  if (process.env.NODE_ENV !== 'production') {
+  const isDevMode = 
+    process.env.NODE_ENV === 'development' || 
+    (typeof import.meta !== 'undefined' && import.meta.url && !import.meta.url.endsWith('server.cjs')) ||
+    (typeof __filename !== 'undefined' && !__filename.endsWith('server.cjs'));
+
+  if (isDevMode) {
+    console.log('[Showroom Server] Starting in live DEVELOPMENT mode (Vite HMR/live-reload layer enabled)...');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
     });
     app.use(vite.middlewares);
   } else {
+    console.log('[Showroom Server] Starting in optimized PRODUCTION mode (statically serving built /dist assets)...');
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
     app.get('*', (req, res) => {
