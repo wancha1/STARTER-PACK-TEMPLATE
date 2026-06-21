@@ -133,6 +133,14 @@ app.use((req, res, next) => {
   next();
 });
 
+// Real-time runtime configurations for public client integrations
+app.get('/api/config', (req, res) => {
+  res.json({
+    supabaseUrl: process.env.VITE_SUPABASE_URL || "",
+    supabaseAnonKey: process.env.VITE_SUPABASE_ANON_KEY || ""
+  });
+});
+
 // Apply API middleware rate limiter
 app.use('/api', apiLimiter);
 

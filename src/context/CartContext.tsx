@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { ShoppingBag, Heart, Bookmark, CheckCircle, X, Sparkles, ArrowRight } from "lucide-react";
 import { Product, CartItem } from "../types";
 import { PRODUCTS } from "../data";
-import { getSupabase, isSupabaseConfigured, mapSupabaseToFrontend } from "../lib/supabase";
+import { getSupabase, isSupabaseConfigured, mapSupabaseToFrontend, getIsSupabaseConfigured, configureSupabaseRuntime } from "../lib/supabase";
 import { 
   auth as firebaseAuth
 } from "../lib/firebase";
@@ -339,6 +339,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Supabase Admin User State
   const [adminUser, setAdminUser] = useState<any | null>(null);
   const [csrfToken, setCsrfToken] = useState<string | null>(null);
+  const [isSupabaseActive, setIsSupabaseActive] = useState<boolean>(false);
+  const [isConfigLoaded, setIsConfigLoaded] = useState<boolean>(false);
 
   // Customer Firebase Auth State
   const [customerUser, setCustomerUser] = useState<any | null>(null);
@@ -394,6 +396,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Monitor secure cookie admin sessions and Supabase Auth updates in parallel
   useEffect(() => {
+    if (!isConfigLoaded) return;
+
     const checkAdminSession = async () => {
       try {
         // Enforce cookie session lookup using credentials: include parameter (supports standard iframe cookies)
@@ -444,7 +448,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         subscription.unsubscribe();
       };
     }
-  }, [csrfToken]);
+  }, [csrfToken, isConfigLoaded]);
 
   // Listen for Google Auth callback message from popup
   useEffect(() => {
@@ -530,9 +534,25 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  // Load products dynamically on mount
+  // Load products dynamically on mount checking runtime environment variables dynamically
   useEffect(() => {
-    loadProducts();
+    async function initializeAndLoad() {
+      try {
+        const res = await fetch("/api/config").catch(() => null);
+        if (res && res.ok) {
+          const config = await res.json();
+          if (config.supabaseUrl && config.supabaseAnonKey) {
+            configureSupabaseRuntime(config.supabaseUrl, config.supabaseAnonKey);
+          }
+        }
+      } catch (e) {
+        console.warn("Dynamic configuration proxy handshake missed.", e);
+      }
+      setIsSupabaseActive(getIsSupabaseConfigured());
+      setIsConfigLoaded(true);
+      await loadProducts();
+    }
+    initializeAndLoad();
   }, []);
 
   const refreshCatalog = async () => {
@@ -848,7 +868,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setAdminUser,
         csrfToken,
         setCsrfToken,
-        isSupabaseActive: isSupabaseConfigured,
+        isSupabaseActive,
         customerUser,
         customerLoading,
         loginCustomerWithGoogle,

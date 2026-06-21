@@ -1,25 +1,45 @@
 import { createClient } from "@supabase/supabase-js";
 import { Product } from "../types";
 
-const supabaseUrl = ((import.meta as any).env?.VITE_SUPABASE_URL) || "";
-const supabaseAnonKey = ((import.meta as any).env?.VITE_SUPABASE_ANON_KEY) || "";
+let supabaseUrl = ((import.meta as any).env?.VITE_SUPABASE_URL) || "";
+let supabaseAnonKey = ((import.meta as any).env?.VITE_SUPABASE_ANON_KEY) || "";
 
-export const isSupabaseConfigured = 
-  supabaseUrl && 
-  supabaseUrl !== "YOUR_SUPABASE_URL" && 
-  supabaseAnonKey && 
-  supabaseAnonKey !== "YOUR_SUPABASE_ANON_KEY";
+export function getIsSupabaseConfigured(): boolean {
+  const urlValid = supabaseUrl && 
+                  supabaseUrl !== "YOUR_SUPABASE_URL" && 
+                  !supabaseUrl.includes("YOUR_SUPABASE") && 
+                  supabaseUrl.startsWith("http");
+  const keyValid = supabaseAnonKey && 
+                  supabaseAnonKey !== "YOUR_SUPABASE_ANON_KEY" && 
+                  !supabaseAnonKey.includes("YOUR_SUPABASE") && 
+                  supabaseAnonKey.length > 20;
+  return !!(urlValid && keyValid);
+}
+
+export const isSupabaseConfigured = getIsSupabaseConfigured();
 
 let supabaseInstance: ReturnType<typeof createClient> | null = null;
 
 export function getSupabase() {
-  if (!isSupabaseConfigured) {
+  if (!getIsSupabaseConfigured()) {
     return null;
   }
   if (!supabaseInstance) {
     supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
   }
   return supabaseInstance;
+}
+
+export function configureSupabaseRuntime(url: string, anonKey: string) {
+  if (url && anonKey) {
+    const isNewUrl = url !== "YOUR_SUPABASE_URL" && !url.includes("YOUR_SUPABASE") && url.startsWith("http");
+    const isNewKey = anonKey !== "YOUR_SUPABASE_ANON_KEY" && !anonKey.includes("YOUR_SUPABASE") && anonKey.length > 20;
+    if (isNewUrl && isNewKey) {
+      supabaseUrl = url;
+      supabaseAnonKey = anonKey;
+      supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
+    }
+  }
 }
 
 export interface SupabaseProduct {
