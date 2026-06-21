@@ -871,10 +871,19 @@ Please assign a tech concierge to review stock and delivery schedules at my conv
                     </div>
 
                     {/* Scarcity Banner ribbon on card */}
-                    <div className="mb-4 text-left">
+                    <div className="mb-4 text-left flex flex-wrap gap-1.5 items-center">
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-mono font-medium ${urgency.style}`}>
                         {urgency.label}
                       </span>
+                      {product.warrantyStatus && (
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border text-[10px] font-mono font-semibold ${
+                          product.warrantyStatus === "Official"
+                            ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                            : "bg-blue-50 text-blue-800 border-blue-200"
+                        }`}>
+                          {product.warrantyStatus === "Official" ? "🛡️ Official Warranty" : "⚙️ Refurbished"}
+                        </span>
+                      )}
                     </div>
 
                     {/* Feature highlight line - Understated & Minimalist */}
@@ -1286,8 +1295,20 @@ Please assign a tech concierge to review stock and delivery schedules at my conv
               <div className="lg:col-span-12 xl:col-span-6 space-y-6 text-left">
                 
                 <div>
-                  <span className="text-[10px] font-mono tracking-widest uppercase text-slate-500 mb-1 block font-medium">
-                    {selectedQuickViewProduct.category} Catalog Series
+                  <span className="text-[10px] font-mono tracking-widest uppercase text-slate-500 mb-1 flex items-center flex-wrap gap-1.5 font-medium">
+                    <span>{selectedQuickViewProduct.category} Catalog Series</span>
+                    {selectedQuickViewProduct.warrantyStatus && (
+                      <>
+                        <span className="text-slate-700 font-normal">·</span>
+                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded uppercase tracking-wider border-0 shrink-0 ${
+                          selectedQuickViewProduct.warrantyStatus === "Official"
+                            ? "bg-emerald-950/50 text-emerald-400"
+                            : "bg-blue-950/50 text-blue-400"
+                        }`}>
+                          {selectedQuickViewProduct.warrantyStatus === "Official" ? "🛡️ Official Warranty" : "⚙️ Manufacturer Refurbished"}
+                        </span>
+                      </>
+                    )}
                   </span>
                   <h3 className="font-display font-medium text-2xl md:text-3xl text-white leading-tight">
                     {selectedQuickViewProduct.name}

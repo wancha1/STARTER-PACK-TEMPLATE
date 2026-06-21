@@ -83,7 +83,8 @@ export const PRODUCTS: Product[] = [
     stockStatus: "In Stock",
     stockQuantity: 14,
     specs: ["A17 Pro Chip", "6.7\" Super Retina XDR", "5x Optical Zoom Camera", "USB-C High Speed"],
-    iconName: "Smartphone"
+    iconName: "Smartphone",
+    warrantyStatus: "Official"
   },
   {
     id: "galaxy-s24-ultra",
@@ -100,7 +101,8 @@ export const PRODUCTS: Product[] = [
     stockStatus: "In Stock",
     stockQuantity: 8,
     specs: ["Snapdragon 8 Gen 3", "6.8\" Dynamic AMOLED 2X", "S-Pen Stylus Included", "Galaxy AI Engine"],
-    iconName: "Smartphone"
+    iconName: "Smartphone",
+    warrantyStatus: "Official"
   },
   {
     id: "macbook-pro-m3",
@@ -117,7 +119,8 @@ export const PRODUCTS: Product[] = [
     stockStatus: "In Stock",
     stockQuantity: 6,
     specs: ["Apple M3 8-Core CPU", "16GB Unified Memory", "14.2\" Liquid Retina XDR", "Up to 22h Battery Life"],
-    iconName: "Laptop"
+    iconName: "Laptop",
+    warrantyStatus: "Official"
   },
   {
     id: "hp-elitebook-840",
@@ -134,7 +137,8 @@ export const PRODUCTS: Product[] = [
     stockStatus: "Out of Stock",
     stockQuantity: 0,
     specs: ["Intel Core i7 13th Gen", "16GB DDR5 RAM", "14.0\" FHD Anti-Glare", "Windows 11 Pro Licensed"],
-    iconName: "Laptop"
+    iconName: "Laptop",
+    warrantyStatus: "Manufacturer Refurbished"
   },
   {
     id: "sony-ps5-slim",
@@ -151,7 +155,8 @@ export const PRODUCTS: Product[] = [
     stockStatus: "Low Stock",
     stockQuantity: 3,
     specs: ["Ultra-High Speed 1TB SSD", "Haptic Feedback Control", "4K-TV Gaming Output", "Ray Tracing Technology"],
-    iconName: "Gamepad2"
+    iconName: "Gamepad2",
+    warrantyStatus: "Official"
   },
   {
     id: "samsung-55-4k",
@@ -167,7 +172,8 @@ export const PRODUCTS: Product[] = [
     stockStatus: "In Stock",
     stockQuantity: 5,
     specs: ["55\" HDR 4K Screen", "Tizen Smart TV OS", "Object Tracking Sound Lite", "DSTV/Netflix Preloaded"],
-    iconName: "Tv"
+    iconName: "Tv",
+    warrantyStatus: "Official"
   },
   {
     id: "airpods-pro-2",
@@ -183,7 +189,8 @@ export const PRODUCTS: Product[] = [
     stockStatus: "In Stock",
     stockQuantity: 22,
     specs: ["Active Noise Cancelling", "Adaptive Transparency", "USB-C MagSafe Case", "Up to 6 hours listening"],
-    iconName: "Headphones"
+    iconName: "Headphones",
+    warrantyStatus: "Official"
   },
   {
     id: "anker-prime-100w",
@@ -199,7 +206,8 @@ export const PRODUCTS: Product[] = [
     stockStatus: "Out of Stock",
     stockQuantity: 0,
     specs: ["100W Power Delivery", "Gallium Nitride (GaN) Tech", "3-Port Multi Charging", "ActiveShield Safety 2.0"],
-    iconName: "Speaker"
+    iconName: "Speaker",
+    warrantyStatus: "Official"
   }
 ];
 

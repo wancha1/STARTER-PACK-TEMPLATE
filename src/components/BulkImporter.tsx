@@ -2002,6 +2002,17 @@ export default function BulkImporter() {
                               <option value="Out of Stock">Out of Stock</option>
                             </select>
                           </div>
+                          <div>
+                            <label className="block text-[10px] font-mono text-slate-500 uppercase font-bold mb-1">Warranty Status:</label>
+                            <select
+                              value={editingProduct.warrantyStatus || "Official"}
+                              onChange={(e) => setEditingProduct({ ...editingProduct, warrantyStatus: e.target.value as any })}
+                              className="w-full bg-[#0a0a14] border border-white/10 rounded-lg p-2 text-white outline-none focus:border-emerald-500"
+                            >
+                              <option value="Official">Official</option>
+                              <option value="Manufacturer Refurbished">Manufacturer Refurbished</option>
+                            </select>
+                          </div>
                           <div className="flex items-end">
                             <button
                               type="submit"

@@ -94,7 +94,8 @@ export function mapSupabaseToFrontend(p: SupabaseProduct): Product {
     iconName: ds.iconName || "Smartphone",
     videoPreview: ds.videoPreview || undefined,
     detailedSpecs: ds.techSpecs || [],
-    stockQuantity: ds.stockQuantity !== undefined ? Number(ds.stockQuantity) : undefined
+    stockQuantity: ds.stockQuantity !== undefined ? Number(ds.stockQuantity) : undefined,
+    warrantyStatus: ds.warrantyStatus || undefined
   };
 }
 
@@ -122,7 +123,8 @@ export function mapFrontendToSupabase(p: Product): Partial<SupabaseProduct> {
       iconName: p.iconName,
       videoPreview: p.videoPreview,
       techSpecs: p.detailedSpecs || [],
-      stockQuantity: p.stockQuantity
+      stockQuantity: p.stockQuantity,
+      warrantyStatus: p.warrantyStatus
     }
   };
 }

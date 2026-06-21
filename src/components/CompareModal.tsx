@@ -153,6 +153,16 @@ export default function CompareModal() {
                           {item1.stockStatus}
                         </span>
                       </div>
+                      {item1.warrantyStatus && (
+                        <div className="flex justify-between items-center text-xs pt-2 border-t border-white/5">
+                          <span className="text-slate-500">Warranty Status:</span>
+                          <span className={`font-mono font-semibold text-[10px] px-1.5 py-0.5 rounded ${
+                            item1.warrantyStatus === "Official" ? "bg-emerald-500/10 text-emerald-400" : "bg-blue-500/10 text-blue-400"
+                          }`}>
+                            {item1.warrantyStatus === "Official" ? "🛡️ Official Warranty" : "⚙️ Refurbished"}
+                          </span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Spec features listing */}
@@ -235,6 +245,16 @@ export default function CompareModal() {
                             {item2.stockStatus}
                           </span>
                         </div>
+                        {item2.warrantyStatus && (
+                          <div className="flex justify-between items-center text-xs pt-2 border-t border-white/5">
+                            <span className="text-slate-500">Warranty Status:</span>
+                            <span className={`font-mono font-semibold text-[10px] px-1.5 py-0.5 rounded ${
+                              item2.warrantyStatus === "Official" ? "bg-emerald-500/10 text-emerald-400" : "bg-blue-500/10 text-blue-400"
+                            }`}>
+                              {item2.warrantyStatus === "Official" ? "🛡️ Official Warranty" : "⚙️ Refurbished"}
+                            </span>
+                          </div>
+                        )}
                       </div>
 
                       {/* Spec features listing */}

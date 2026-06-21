@@ -313,9 +313,20 @@ export default function SearchModal() {
                               </div>
 
                               <div className="min-w-0">
-                                <span className="text-[9px] font-mono tracking-wider uppercase text-slate-500 block">
-                                  {product.category}
-                                </span>
+                                <div className="flex flex-wrap items-center gap-1.5 mb-0.5">
+                                  <span className="text-[9px] font-mono tracking-wider uppercase text-slate-500 block">
+                                    {product.category}
+                                  </span>
+                                  {product.warrantyStatus && (
+                                    <span className={`text-[8px] font-mono font-bold px-1.5 py-0.2 rounded ${
+                                      product.warrantyStatus === "Official"
+                                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                        : "bg-blue-50 text-blue-700 border border-blue-200"
+                                    }`}>
+                                      {product.warrantyStatus === "Official" ? "Official" : "Refurbished"}
+                                    </span>
+                                  )}
+                                </div>
                                 <h4 className="text-sm font-semibold text-slate-900 group-hover:text-blue-600 font-display transition-colors truncate">
                                   {product.name}
                                 </h4>

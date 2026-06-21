@@ -44,6 +44,7 @@ export interface Product {
   stockStatus: "In Stock" | "Low Stock" | "Out of Stock";
   stockQuantity?: number;
   iconName: "Smartphone" | "Laptop" | "Tv" | "Gamepad2" | "Watch" | "Headphones" | "Camera" | "Speaker";
+  warrantyStatus?: "Official" | "Manufacturer Refurbished";
   // Media & Scalable spec additions
   images?: string[];
   videos?: string[];
