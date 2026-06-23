@@ -12,6 +12,7 @@ import WhatsAppFloating from "./components/WhatsAppFloating";
 import CartDrawer from "./components/CartDrawer";
 import WishlistDrawer from "./components/WishlistDrawer";
 import SearchModal from "./components/SearchModal";
+import CategoriesDrawer from "./components/CategoriesDrawer";
 import { CartProvider, useCart } from "./context/CartContext";
 import BulkImporter from "./components/BulkImporter";
 
@@ -92,6 +93,9 @@ function MainLayout() {
 
       {/* Global Interactive Search Modal Drawer */}
       <SearchModal />
+
+      {/* Jumia-style Categories Directory Drawer */}
+      <CategoriesDrawer />
 
       {/* Pulsing floating WhatsApp floating trigger */}
       <WhatsAppFloating />

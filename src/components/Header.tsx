@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Menu, X, MessageSquare, Smartphone, ShoppingBag, Heart, Search, Bookmark, User, LogOut, ChevronDown, Sun, Moon } from "lucide-react";
+import { Menu, X, MessageSquare, Smartphone, ShoppingBag, Heart, Search, Bookmark, User, LogOut, ChevronDown, Sun, Moon, LayoutGrid, ChevronRight } from "lucide-react";
 import { BUSINESS_INFO } from "../data";
 import { useCart } from "../context/CartContext";
 import { motion, AnimatePresence } from "motion/react";
@@ -18,6 +18,8 @@ export default function Header() {
     setIsWishlistOpen, 
     isSearchOpen,
     setIsSearchOpen,
+    isCategoriesOpen,
+    setIsCategoriesOpen,
     customerUser,
     logoutCustomer,
     isDarkMode,
@@ -84,6 +86,13 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-8" id="desktop-nav">
+            <button
+              onClick={() => setIsCategoriesOpen(true)}
+              className="text-neutral-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 text-sm font-semibold transition-all duration-300 hover:scale-[1.03] flex items-center gap-1.5 cursor-pointer"
+            >
+              <LayoutGrid className="w-4.5 h-4.5 text-orange-500 animate-pulse" />
+              <span>Departments</span>
+            </button>
             {navLinks.map((link) => (
               <a
                 key={link.name}
@@ -312,6 +321,20 @@ export default function Header() {
             className="lg:hidden bg-white/85 dark:bg-slate-950/85 border-b border-gray-200 dark:border-white/5 backdrop-blur-xl"
           >
             <div className="px-4 pt-2 pb-6 space-y-2">
+              <button
+                onClick={() => {
+                  setIsCategoriesOpen(true);
+                  setIsOpen(false);
+                }}
+                className="w-full flex items-center justify-between px-4 py-3.5 rounded-xl bg-orange-500/10 dark:bg-orange-950/20 border border-orange-500/20 text-orange-600 dark:text-orange-400 text-base font-bold transition-all text-left cursor-pointer"
+              >
+                <div className="flex items-center gap-2.5">
+                  <LayoutGrid className="w-5 h-5 text-orange-500 animate-pulse" />
+                  <span>Jumia Departments</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-orange-400" />
+              </button>
+
               {navLinks.map((link) => (
                 <a
                   key={link.name}

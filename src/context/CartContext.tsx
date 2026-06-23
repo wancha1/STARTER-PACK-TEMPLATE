@@ -73,6 +73,8 @@ interface CartContextType {
   setActiveCategory: (category: string) => void;
   selectedQuickViewProduct: any | null;
   setSelectedQuickViewProduct: (product: any | null) => void;
+  globalSearchTerm: string;
+  setGlobalSearchTerm: (term: string) => void;
 
   // Merchant Admin Control panel
   showMerchantAdmin: boolean;
@@ -81,6 +83,10 @@ interface CartContextType {
   // Search Modal Feature
   isSearchOpen: boolean;
   setIsSearchOpen: (open: boolean) => void;
+
+  // Jumia Categories Drawer Feature
+  isCategoriesOpen: boolean;
+  setIsCategoriesOpen: (open: boolean) => void;
 
   // Supabase Auth Properties
   adminUser: any | null;
@@ -648,6 +654,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // SEO state
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const [selectedQuickViewProduct, setSelectedQuickViewProduct] = useState<any | null>(null);
+  const [globalSearchTerm, setGlobalSearchTerm] = useState<string>("");
 
   const [cart, setCart] = useState<CartItem[]>(() => {
     try {
@@ -712,6 +719,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Search overlay state
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  // Categories drawer state
+  const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("apex_cart", JSON.stringify(cart));
@@ -890,10 +900,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setActiveCategory,
         selectedQuickViewProduct,
         setSelectedQuickViewProduct,
+        globalSearchTerm,
+        setGlobalSearchTerm,
         showMerchantAdmin,
         setShowMerchantAdmin,
         isSearchOpen,
         setIsSearchOpen,
+        isCategoriesOpen,
+        setIsCategoriesOpen,
         refreshCatalog,
         adminUser,
         setAdminUser,

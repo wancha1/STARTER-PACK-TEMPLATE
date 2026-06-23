@@ -63,9 +63,10 @@ const FLASH_DEALS = [
 ];
 
 export default function Hero() {
-  const { activeCategory, setActiveCategory, setSelectedQuickViewProduct } = useCart();
+  const { activeCategory, setActiveCategory, setSelectedQuickViewProduct, setGlobalSearchTerm } = useCart();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [timeStr, setTimeStr] = useState("05:14:22");
+  const [activeHoverCategory, setActiveHoverCategory] = useState<string | null>(null);
 
   // Interactive Tabbed Hub control state
   const [activeTab, setActiveTab] = useState<"spin" | "flash" | "shipping">("spin");
@@ -172,16 +173,84 @@ export default function Hero() {
     window.open(`https://wa.me/${BUSINESS_INFO.whatsappNumber}?text=${defaultMsg}`, "_blank");
   };
 
-  const categoriesList = [
-    { name: "Phones", label: "Smartphones & Tablets", icon: Smartphone },
-    { name: "Laptops", label: "Computing & Business", icon: Laptop },
-    { name: "TVs & Audio", label: "Smart screens & Sound", icon: Tv },
-    { name: "Gaming", label: "Consoles & Controllers", icon: Gamepad2 },
-    { name: "Accessories", label: "Caretags & Chargers", icon: Headphones }
+  const JUMIA_CATEGORIES = [
+    {
+      name: "Phones",
+      label: "Smartphones & Tablets",
+      icon: Smartphone,
+      color: "from-amber-500 to-orange-500",
+      badge: "Hot",
+      subcategories: ["Apple iPhones", "Samsung Galaxy", "TECNO & Infinix", "Redmi & Xiaomi", "Tablet Deals"],
+      popularBrands: ["Apple", "Samsung", "TECNO", "Infinix", "Xiaomi"],
+      tagline: "Up to 2-Year official local warranties"
+    },
+    {
+      name: "Laptops",
+      label: "Computing & Business",
+      icon: Laptop,
+      color: "from-blue-500 to-indigo-500",
+      badge: "Pro",
+      subcategories: ["Apple MacBooks", "HP EliteBooks", "Dell Latitudes", "Lenovo ThinkPads", "Office Software"],
+      popularBrands: ["Apple", "HP", "Dell", "Lenovo", "Microsoft"],
+      tagline: "Preloaded licensed Microsoft Office"
+    },
+    {
+      name: "TVs & Audio",
+      label: "Smart screens & Sound",
+      icon: Tv,
+      color: "from-purple-500 to-pink-500",
+      badge: "-12%",
+      subcategories: ["4K Smart TVs", "Home Theater Audio", "Soundbars & Bass", "Digital Protectors", "Wall Mounts"],
+      popularBrands: ["Sony", "Samsung", "LG", "Hisense", "JBL"],
+      tagline: "Free concrete wall mounting setup"
+    },
+    {
+      name: "Gaming",
+      label: "Consoles & Controllers",
+      icon: Gamepad2,
+      color: "from-red-500 to-rose-500",
+      badge: "New",
+      subcategories: ["PlayStation 5", "PlayStation 4", "Xbox Series X/S", "Wireless Controllers", "Nintendo Switch"],
+      popularBrands: ["Sony", "Microsoft", "Nintendo", "Logitech"],
+      tagline: "12-Month swap/replacement guarantee"
+    },
+    {
+      name: "Accessories",
+      label: "Caretags & Chargers",
+      icon: Headphones,
+      color: "from-emerald-500 to-teal-500",
+      badge: "Deal",
+      subcategories: ["Superfast Chargers", "Wireless Earbuds", "Screen Protectors", "Power Banks", "Cables & Adapters"],
+      popularBrands: ["Anker", "Apple", "Samsung", "Oraimo", "Baseus"],
+      tagline: "100% Genuine charging accessories"
+    }
   ];
 
   const handleCategoryChoice = (categoryName: string) => {
     setActiveCategory(categoryName);
+    setGlobalSearchTerm("");
+    setActiveHoverCategory(null);
+    const element = document.getElementById("services");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  const handleSubcategoryChoice = (categoryName: string, subcategoryName: string) => {
+    setActiveCategory(categoryName);
+    const searchQuery = subcategoryName.replace(/Apple |Samsung |HP |Dell |TECNO & |Redmi & /i, "");
+    setGlobalSearchTerm(searchQuery);
+    setActiveHoverCategory(null);
+    const element = document.getElementById("services");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  const handleBrandChoice = (categoryName: string, brandName: string) => {
+    setActiveCategory(categoryName);
+    setGlobalSearchTerm(brandName);
+    setActiveHoverCategory(null);
     const element = document.getElementById("services");
     if (element) {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -273,35 +342,40 @@ export default function Hero() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* State-of-the-art interactive grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch relative">
           
           {/* 1. Left Sidebar: Jumia-style Categories Directory */}
-          <div className="hidden lg:col-span-3 lg:flex flex-col glass-panel glass-panel-hover rounded-2xl p-4 text-left justify-between min-h-[460px]">
+          <div 
+            className="hidden lg:col-span-3 lg:flex flex-col glass-panel glass-panel-hover rounded-2xl p-4 text-left justify-between min-h-[460px] relative"
+            onMouseLeave={() => setActiveHoverCategory(null)}
+          >
             <div className="space-y-1">
               <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 tracking-widest font-bold block mb-3.5 px-2">
                 🏠 DEPARTMENTS
               </span>
-              {categoriesList.map((cat) => {
+              {JUMIA_CATEGORIES.map((cat) => {
                 const IconComp = cat.icon;
                 const isSelected = activeCategory === cat.name;
+                const isHovered = activeHoverCategory === cat.name;
                 return (
                   <button
                     key={cat.name}
                     onClick={() => handleCategoryChoice(cat.name)}
+                    onMouseEnter={() => setActiveHoverCategory(cat.name)}
                     className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all cursor-pointer text-left group border ${
-                      isSelected 
-                        ? "bg-blue-50/80 dark:bg-blue-950/30 border-blue-200 dark:border-blue-900/30 text-blue-600 dark:text-blue-400 font-bold" 
+                      isHovered || isSelected 
+                        ? "bg-orange-50/80 dark:bg-orange-950/25 border-orange-200 dark:border-orange-900/30 text-orange-600 dark:text-orange-450 font-bold" 
                         : "text-slate-600 dark:text-slate-300 hover:text-neutral-900 dark:hover:text-white hover:bg-gray-50/50 dark:hover:bg-slate-900/40 border-transparent"
                     }`}
                   >
-                    <div className={`p-1.5 rounded-lg ${isSelected ? "bg-blue-100/80 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400" : "bg-gray-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"}`}>
+                    <div className={`p-1.5 rounded-lg ${isHovered || isSelected ? "bg-orange-100/80 dark:bg-orange-950/60 text-orange-600 dark:text-orange-450" : "bg-gray-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"}`}>
                       <IconComp className="w-3.5 h-3.5 shrink-0" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="text-xs font-semibold leading-tight">{cat.name}</div>
                       <div className="text-[9px] text-slate-500 dark:text-slate-400 truncate leading-none mt-0.5">{cat.label}</div>
                     </div>
-                    <ChevronRight className={`w-3.5 h-3.5 transition-transform ${isSelected ? "text-blue-600 dark:text-blue-400 translate-x-0.5" : "text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300"}`} />
+                    <ChevronRight className={`w-3.5 h-3.5 transition-transform ${isHovered || isSelected ? "text-orange-500 dark:text-orange-400 translate-x-0.5" : "text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300"}`} />
                   </button>
                 );
               })}
@@ -309,7 +383,7 @@ export default function Hero() {
 
             <div className="border-t border-gray-100 dark:border-white/5 pt-4 mt-4 px-2 select-none">
               <div className="flex items-center gap-2 mb-1.5">
-                <Shield className="w-3.5 h-3.5 text-blue-500 dark:text-blue-450" />
+                <Shield className="w-3.5 h-3.5 text-orange-500 dark:text-orange-400" />
                 <span className="text-[9px] font-mono font-bold text-neutral-900 dark:text-white uppercase tracking-wider">
                   Verified Local Security
                 </span>
@@ -318,6 +392,87 @@ export default function Hero() {
                 100% Genuine electronics. Escrow-protected local pay upon physical examination.
               </p>
             </div>
+
+            {/* Desktop Megamenu Flyout (Rendered next to Left Sidebar) */}
+            <AnimatePresence>
+              {activeHoverCategory && (
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute left-[101%] top-0 bottom-0 w-[420px] bg-white dark:bg-[#070719] border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl p-6 z-40 flex flex-col justify-between text-left"
+                >
+                  {JUMIA_CATEGORIES.map((cat) => {
+                    if (cat.name !== activeHoverCategory) return null;
+                    return (
+                      <div key={cat.name} className="h-full flex flex-col justify-between">
+                        <div className="space-y-6">
+                          {/* Title segment */}
+                          <div>
+                            <span className="text-[9px] font-mono font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest block mb-0.5">
+                              DEPARTMENT HUB
+                            </span>
+                            <h4 className="text-lg font-display font-black text-slate-900 dark:text-white">
+                              {cat.label}
+                            </h4>
+                            <p className="text-[10px] text-slate-400 dark:text-slate-500 font-sans italic">
+                              {cat.tagline}
+                            </p>
+                          </div>
+
+                          {/* Subcategories list */}
+                          <div className="space-y-2.5">
+                            <span className="text-[9px] font-mono font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
+                              Popular Categories
+                            </span>
+                            <div className="grid grid-cols-1 gap-1.5">
+                              {cat.subcategories.map((sub) => (
+                                <button
+                                  key={sub}
+                                  onClick={() => handleSubcategoryChoice(cat.name, sub)}
+                                  className="w-full text-left py-2 px-3 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-900/45 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-orange-500 dark:hover:text-orange-400 transition-colors flex items-center justify-between cursor-pointer"
+                                >
+                                  <span>{sub}</span>
+                                  <ChevronRight className="w-3 h-3 text-slate-400" />
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Brand hubs */}
+                          <div className="space-y-2">
+                            <span className="text-[9px] font-mono font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
+                              Official Brands
+                            </span>
+                            <div className="flex flex-wrap gap-1.5">
+                              {cat.popularBrands.map((brand) => (
+                                <button
+                                  key={brand}
+                                  onClick={() => handleBrandChoice(cat.name, brand)}
+                                  className="px-2.5 py-1 rounded-lg text-[10px] font-bold border border-gray-200 dark:border-white/10 bg-white dark:bg-slate-900 hover:border-orange-500 dark:hover:border-orange-500 hover:bg-orange-50/20 dark:hover:bg-orange-950/20 text-slate-700 dark:text-slate-350 hover:text-orange-500 dark:hover:text-orange-400 cursor-pointer transition-colors"
+                                >
+                                  {brand}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Direct link */}
+                        <button
+                          onClick={() => handleCategoryChoice(cat.name)}
+                          className="w-full py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 rounded-xl text-white text-xs font-extrabold flex items-center justify-center gap-1.5 cursor-pointer shadow-md shadow-orange-500/10"
+                        >
+                          <span>Explore All {cat.name} Deals</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* 2. Middle Column: Jumia-style Main Promotion Banner Carousel */}
@@ -374,7 +529,7 @@ export default function Hero() {
                   <ArrowRight className="w-3 h-3" />
                 </button>
                 <button
-                  onClick={() => handleCategoryChoice(categoriesList[currentSlide % categoriesList.length].name)}
+                  onClick={() => handleCategoryChoice(JUMIA_CATEGORIES[currentSlide % JUMIA_CATEGORIES.length].name)}
                   className="px-4 py-2.5 rounded-xl text-[11px] font-semibold text-slate-300 bg-white/10 border border-white/20 hover:bg-white/20 hover:border-white/30 transition-all text-center"
                 >
                   Quick Department
@@ -397,6 +552,58 @@ export default function Hero() {
             </div>
           </div>
 
+        </div>
+
+        {/* Jumia-style Mobile Circular Category Quick-Link Row */}
+        <div className="mt-8 pt-6 border-t border-gray-150/50 dark:border-white/5">
+          <div className="flex items-center justify-between mb-4 px-1 select-none">
+            <div className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
+              <span className="text-[10px] font-mono font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                🛒 Fast Categories (Jumia Style)
+              </span>
+            </div>
+            <span className="text-[10px] font-mono font-bold text-orange-500 uppercase tracking-wider animate-pulse">
+              100% Genuine
+            </span>
+          </div>
+
+          <div className="flex items-start gap-4 overflow-x-auto pb-3.5 scrollbar-none snap-x -mx-4 px-4 sm:mx-0 sm:px-0">
+            {JUMIA_CATEGORIES.map((cat) => {
+              const IconComp = cat.icon;
+              const isSelected = activeCategory === cat.name;
+              return (
+                <button
+                  key={cat.name}
+                  onClick={() => handleCategoryChoice(cat.name)}
+                  className="flex flex-col items-center text-center shrink-0 snap-start select-none group cursor-pointer w-20"
+                >
+                  <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 relative ${
+                    isSelected
+                      ? "bg-gradient-to-tr from-orange-500 to-amber-500 text-white shadow-lg shadow-orange-500/25 scale-105"
+                      : "bg-gray-150/40 dark:bg-slate-900/30 text-slate-700 dark:text-slate-350 border border-gray-200/50 dark:border-white/5 hover:border-orange-500/40 hover:text-orange-500 dark:hover:text-orange-400 hover:scale-105"
+                  }`}>
+                    {/* Hot Badges */}
+                    {cat.name === "Phones" && (
+                      <span className="absolute -top-1 -right-1 px-1.5 py-0.5 text-[7px] font-mono font-black text-white bg-red-500 rounded-full scale-90 tracking-tight uppercase">Hot</span>
+                    )}
+                    {cat.name === "Laptops" && (
+                      <span className="absolute -top-1 -right-1 px-1.5 py-0.5 text-[7px] font-mono font-black text-white bg-blue-500 rounded-full scale-90 tracking-tight uppercase">Pro</span>
+                    )}
+                    {cat.name === "TVs & Audio" && (
+                      <span className="absolute -top-1 -right-1 px-1.5 py-0.5 text-[7px] font-mono font-black text-white bg-purple-500 rounded-full scale-90 tracking-tight uppercase">New</span>
+                    )}
+                    <IconComp className="w-5 h-5" />
+                  </div>
+                  <span className={`text-[10px] sm:text-xs font-bold mt-2 truncate max-w-full ${
+                    isSelected ? "text-orange-500 dark:text-orange-400" : "text-slate-700 dark:text-slate-400 group-hover:text-orange-500"
+                  }`}>
+                    {cat.name}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
       </div>

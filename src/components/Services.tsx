@@ -118,6 +118,8 @@ export default function Services() {
     setActiveCategory,
     selectedQuickViewProduct,
     setSelectedQuickViewProduct,
+    globalSearchTerm: searchTerm,
+    setGlobalSearchTerm: setSearchTerm,
     products,
     isProductsLoading,
     setIsCartOpen,
@@ -405,7 +407,6 @@ export default function Services() {
   }, [selectedQuickViewProduct]);
 
   // Search & Filters and Sort Settings 
-  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("featured");
   const [maxPriceLimit, setMaxPriceLimit] = useState(20000000);
 
